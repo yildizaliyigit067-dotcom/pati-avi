@@ -6,28 +6,20 @@
 <title>Pati Avı</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <style>
-  :root{
-    --orange:#ff7a18;--orange-lt:#ff9a44;--orange-deep:#e8590c;
-    --bg:#160f08;--cream:#fbf2e6;--muted:#b59b7c;--line:rgba(255,154,68,.16);
-    --common:#b0a08a;--uncommon:#74c47a;--rare:#5aa8ff;--epic:#c07bff;--legendary:#ffcf4a;
-  }
+  :root{--orange:#ff7a18;--orange-lt:#ff9a44;--orange-deep:#e8590c;--bg:#160f08;--cream:#fbf2e6;--muted:#b59b7c;--line:rgba(255,154,68,.16);
+    --common:#b0a08a;--uncommon:#74c47a;--rare:#5aa8ff;--epic:#c07bff;--legendary:#ffcf4a;}
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
   html,body{height:100%}
-  body{font-family:'Trebuchet MS','Segoe UI',system-ui,sans-serif;background:#0b0805;color:var(--cream);
-    display:flex;align-items:center;justify-content:center;min-height:100dvh;padding:14px}
+  body{font-family:'Trebuchet MS','Segoe UI',system-ui,sans-serif;background:#0b0805;color:var(--cream);display:flex;align-items:center;justify-content:center;min-height:100dvh;padding:14px}
   svg.ic{width:1em;height:1em;display:inline-block;vertical-align:-.12em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
   img{display:block}
-  .phone{width:100%;max-width:390px;height:min(844px,95dvh);background:linear-gradient(180deg,var(--bg),#0d0904);
-    border-radius:38px;overflow:hidden;position:relative;display:flex;flex-direction:column;
-    box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 0 10px #060402,0 0 0 12px #3a2a12}
+  .phone{width:100%;max-width:390px;height:min(844px,95dvh);background:linear-gradient(180deg,var(--bg),#0d0904);border-radius:38px;overflow:hidden;position:relative;display:flex;flex-direction:column;box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 0 10px #060402,0 0 0 12px #3a2a12}
   .notch{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:120px;height:26px;background:#060402;border-radius:0 0 16px 16px;z-index:60}
   header{padding:34px 18px 12px;display:flex;align-items:center;justify-content:space-between;position:relative;z-index:30}
   .brand{display:flex;align-items:center;gap:9px}
-  .brand .logo{width:34px;height:34px;border-radius:11px;background:radial-gradient(circle at 30% 25%,var(--orange-lt),var(--orange-deep));
-    display:grid;place-items:center;box-shadow:0 4px 14px rgba(255,122,24,.45);color:#fff}
+  .brand .logo{width:34px;height:34px;border-radius:11px;background:radial-gradient(circle at 30% 25%,var(--orange-lt),var(--orange-deep));display:grid;place-items:center;box-shadow:0 4px 14px rgba(255,122,24,.45);color:#fff}
   .brand b{font-size:17px;letter-spacing:.3px}.brand span{color:var(--orange);font-weight:800}
-  .coins{display:flex;align-items:center;gap:6px;background:rgba(255,122,24,.1);border:1px solid var(--line);
-    padding:6px 12px;border-radius:30px;font-size:13px;font-weight:800;color:var(--orange-lt)}.coins .ic{font-size:15px}
+  .coins{display:flex;align-items:center;gap:6px;background:rgba(255,122,24,.1);border:1px solid var(--line);padding:6px 12px;border-radius:30px;font-size:13px;font-weight:800;color:var(--orange-lt)}.coins .ic{font-size:15px}
   .stage{flex:1;position:relative;overflow:hidden}
   .screen{position:absolute;inset:0;display:none;flex-direction:column}
   .screen.active{display:flex;animation:fade .3s ease}
@@ -36,8 +28,7 @@
   #leafmap{flex:1;margin:4px 14px 0;border-radius:22px;overflow:hidden;border:1px solid var(--line);background:#241a0c}
   .leaflet-container{background:#241a0c;font-family:inherit}
   .cat-marker{font-size:0;background:none;border:none}
-  .cat-pin{width:50px;height:50px;border-radius:50%;cursor:pointer;animation:bob 2.6s ease-in-out infinite;
-    border:2px solid var(--orange);box-shadow:0 4px 14px rgba(0,0,0,.5),0 0 0 4px rgba(255,122,24,.18);overflow:hidden;background:#2a2014}
+  .cat-pin{width:50px;height:50px;border-radius:50%;cursor:pointer;animation:bob 2.6s ease-in-out infinite;border:2px solid var(--orange);box-shadow:0 4px 14px rgba(0,0,0,.5),0 0 0 4px rgba(255,122,24,.18);overflow:hidden;background:#2a2014}
   .cat-pin img{width:100%;height:100%;object-fit:cover}
   @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
   .you-pin{width:18px;height:18px;background:var(--orange);border-radius:50%;box-shadow:0 0 0 6px rgba(255,122,24,.22),0 0 0 13px rgba(255,122,24,.08)}
@@ -47,65 +38,68 @@
   .ad .badge{font-size:8px;font-weight:800;letter-spacing:.5px;color:#160f08;background:var(--muted);padding:2px 5px;border-radius:4px}
   .ad .txt{flex:1;font-size:11.5px;color:var(--muted);line-height:1.3}.ad .txt b{color:var(--cream)}
   .ad .go{font-size:11px;font-weight:800;color:var(--orange-lt);white-space:nowrap}
-  #catch{align-items:center;justify-content:flex-end;position:relative;background:#0d0904}
-  #cam{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
-  .cam-sim{position:absolute;inset:0;background:radial-gradient(300px 200px at 50% 16%,rgba(255,122,24,.18),transparent),linear-gradient(180deg,#2a1d0d,#100a05)}
-  .cam-sim::before{content:"";position:absolute;inset:0;opacity:.5;background:repeating-linear-gradient(120deg,transparent 0 22px,rgba(255,255,255,.02) 22px 24px)}
-  .scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.35),transparent 30%,transparent 60%,rgba(0,0,0,.55))}
-  .reticle{position:absolute;top:18px;left:14px;right:14px;display:flex;justify-content:space-between;align-items:center;color:rgba(255,255,255,.7);font-size:11px;font-weight:800;letter-spacing:1px;z-index:6}
-  .reticle .live{display:flex;align-items:center;gap:6px}
-  .dot{width:8px;height:8px;border-radius:50%;background:var(--orange);box-shadow:0 0 8px var(--orange);animation:blink 1.4s infinite}
-  @keyframes blink{50%{opacity:.3}}
-  .corner{position:absolute;width:26px;height:26px;border:2px solid rgba(255,255,255,.3);z-index:6}
-  .corner.tl{top:50px;left:18px;border-right:0;border-bottom:0}.corner.tr{top:50px;right:18px;border-left:0;border-bottom:0}
+  /* KAMERA */
+  #catch{position:relative;background:#0d0904}
+  #cam{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000}
+  #snap{display:none}
+  .cam-top{position:absolute;top:16px;left:14px;right:14px;display:flex;justify-content:space-between;align-items:center;color:rgba(255,255,255,.8);font-size:11px;font-weight:800;letter-spacing:1px;z-index:6}
+  .cam-top .live{display:flex;align-items:center;gap:6px}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--orange);box-shadow:0 0 8px var(--orange)}
+  .cam-tag{position:absolute;top:14%;left:50%;transform:translateX(-50%);z-index:6;background:rgba(0,0,0,.5);border:1px solid var(--line);padding:5px 14px;border-radius:30px;font-size:12px;font-weight:700;display:none}
+  .cam-tag em{font-style:normal;color:var(--orange-lt)}
+  .corner{position:absolute;width:26px;height:26px;border:2px solid rgba(255,255,255,.28);z-index:5}
+  .corner.tl{top:54px;left:18px;border-right:0;border-bottom:0}.corner.tr{top:54px;right:18px;border-left:0;border-bottom:0}
   .corner.bl{bottom:150px;left:18px;border-right:0;border-top:0}.corner.br{bottom:150px;right:18px;border-left:0;border-top:0}
-  .cam-err{position:absolute;top:46%;left:18px;right:18px;transform:translateY(-50%);z-index:7;display:none;
-    background:rgba(0,0,0,.6);border:1px solid var(--line);border-radius:16px;padding:16px;text-align:center}
-  .cam-err p{font-size:12.5px;color:var(--cream);line-height:1.5;margin-bottom:12px}
-  .cam-err button{background:var(--orange);color:#160f08;border:0;font-family:inherit;font-weight:800;font-size:12.5px;padding:9px 18px;border-radius:20px;cursor:pointer}
-  .wild-wrap{position:absolute;top:30%;left:50%;transform:translate(-50%,-50%);z-index:4;transition:transform .25s}
-  .wild-wrap.hit{animation:wobble .5s}
-  @keyframes wobble{0%,100%{transform:translate(-50%,-50%)}25%{transform:translate(-58%,-50%) rotate(-7deg)}75%{transform:translate(-42%,-50%) rotate(7deg)}}
-  .wild-frame{width:150px;height:150px;border-radius:50%;overflow:hidden;border:3px solid var(--orange);
-    box-shadow:0 14px 30px rgba(0,0,0,.55),0 0 0 8px rgba(255,122,24,.16)}
-  .wild-frame img{width:100%;height:100%;object-fit:cover}
-  .wild-tag{position:absolute;top:11%;left:50%;transform:translateX(-50%);z-index:5;background:rgba(0,0,0,.5);border:1px solid var(--line);padding:5px 14px;border-radius:30px;font-size:12px;font-weight:700}
-  .wild-tag em{font-style:normal;color:var(--orange-lt)}
-  .can{position:absolute;bottom:158px;left:50%;transform:translateX(-50%);width:58px;height:58px;border-radius:16px;z-index:8;cursor:grab;touch-action:none;
-    background:linear-gradient(160deg,var(--orange-lt),var(--orange-deep));display:grid;place-items:center;box-shadow:0 8px 20px rgba(232,89,12,.5);border:2px solid rgba(255,255,255,.3);user-select:none;color:#fff}
-  .can-label{position:absolute;bottom:128px;left:0;right:0;text-align:center;font-size:11px;color:rgba(255,255,255,.85);z-index:8;pointer-events:none;text-shadow:0 1px 3px #000}
-  .scan-btn{position:absolute;bottom:158px;left:50%;transform:translateX(-50%);z-index:8;display:none;background:var(--orange);color:#160f08;border:0;font-family:inherit;font-weight:800;font-size:13px;padding:13px 22px;border-radius:30px;cursor:pointer;box-shadow:0 8px 20px rgba(255,122,24,.5)}
+  .cam-start{position:absolute;inset:0;z-index:7;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:30px;text-align:center;background:radial-gradient(220px 160px at 50% 38%,rgba(255,122,24,.14),transparent),linear-gradient(180deg,#241a0d,#100a05)}
+  .cam-start .camico{width:74px;height:74px;border-radius:22px;background:rgba(255,122,24,.14);border:1px solid var(--line);display:grid;place-items:center;color:var(--orange)}
+  .cam-start .camico svg{width:38px;height:38px}
+  .cam-start h3{font-size:18px;font-weight:800}
+  .cam-start p{font-size:12.5px;color:var(--muted);line-height:1.5;max-width:240px}
+  .cam-start .ob{background:linear-gradient(135deg,var(--orange-lt),var(--orange-deep));color:#160f08;border:0;font-family:inherit;font-weight:800;font-size:14px;padding:13px 26px;border-radius:26px;cursor:pointer;box-shadow:0 8px 20px rgba(255,122,24,.4)}
+  .cam-start .gb{background:none;border:0;color:var(--muted);font-family:inherit;font-size:12.5px;font-weight:700;text-decoration:underline;cursor:pointer}
+  .cam-err{position:absolute;inset:0;z-index:8;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:30px;text-align:center;background:linear-gradient(180deg,#241a0d,#100a05)}
+  .cam-err p{font-size:13px;color:var(--cream);line-height:1.55;max-width:260px}
+  .cam-err button{background:var(--orange);color:#160f08;border:0;font-family:inherit;font-weight:800;font-size:13px;padding:11px 22px;border-radius:22px;cursor:pointer}
+  .shutter{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);z-index:8;display:none;width:74px;height:74px;border-radius:50%;background:#fff;border:5px solid rgba(255,255,255,.35);cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.5)}
+  .shutter:active{transform:translateX(-50%) scale(.92)}
+  .shutter::after{content:"";position:absolute;inset:8px;border-radius:50%;background:#fff;border:2px solid #160f08}
+  /* ALBÜM */
   #album{padding:14px 0}
-  .album-head{padding:0 18px 10px;display:flex;align-items:baseline;justify-content:space-between}
+  .album-head{padding:0 18px 8px;display:flex;align-items:baseline;justify-content:space-between}
   .album-head h2{font-size:20px;font-weight:800}.album-head .count{font-size:12px;color:var(--muted)}
-  .grid{flex:1;overflow-y:auto;padding:2px 14px 16px;display:grid;grid-template-columns:1fr 1fr;gap:11px}.grid::-webkit-scrollbar{display:none}
+  .album-scroll{flex:1;overflow-y:auto;padding-bottom:14px}.album-scroll::-webkit-scrollbar{display:none}
+  .shots-wrap{padding:0 14px 4px}
+  .shots-title{font-size:12px;color:var(--muted);font-weight:700;margin:4px 2px 8px}
+  .shots{display:flex;gap:9px;overflow-x:auto;padding-bottom:6px}.shots::-webkit-scrollbar{display:none}
+  .shot{flex:0 0 auto;width:76px;height:76px;border-radius:14px;overflow:hidden;border:1px solid var(--line);position:relative;cursor:pointer}
+  .shot img{width:100%;height:100%;object-fit:cover}
+  .shot .ok{position:absolute;bottom:3px;right:3px;font-size:8px;font-weight:800;background:var(--orange);color:#160f08;padding:1px 5px;border-radius:8px}
+  .grid{padding:6px 14px 4px;display:grid;grid-template-columns:1fr 1fr;gap:11px}
   .card{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:18px;padding:10px;position:relative;overflow:hidden;cursor:pointer;transition:transform .15s}
   .card:active{transform:scale(.97)}.card.locked{opacity:.55}
   .card .photo{width:100%;aspect-ratio:1;border-radius:13px;overflow:hidden;margin-bottom:8px;background:#241a0c;position:relative}
   .card .photo img{width:100%;height:100%;object-fit:cover}
-  .card.locked .photo{display:grid;place-items:center}
-  .card.locked .photo .q{font-size:30px;color:#5a4a33;font-weight:800}
+  .card.locked .photo{display:grid;place-items:center}.card.locked .photo .q{font-size:30px;color:#5a4a33;font-weight:800}
   .card .nm{font-size:14px;font-weight:800}.card .hb{font-size:10.5px;color:var(--muted);margin-top:1px}
   .rar{position:absolute;top:8px;right:8px;z-index:2;font-size:8.5px;font-weight:800;letter-spacing:.6px;padding:3px 7px;border-radius:20px;text-transform:uppercase}
   .serial{position:absolute;top:8px;left:8px;z-index:2;font-size:9px;color:#fff;font-weight:700;background:rgba(0,0,0,.45);padding:2px 6px;border-radius:10px}
+  .yours{position:absolute;bottom:8px;left:8px;z-index:2;font-size:8px;font-weight:800;background:var(--orange);color:#160f08;padding:2px 6px;border-radius:8px}
   .card .stats{display:flex;gap:6px;margin-top:8px}
   .pip{flex:1;height:4px;border-radius:4px;background:rgba(255,255,255,.1);overflow:hidden}.pip i{display:block;height:100%}
-  #battle{padding:14px;align-items:center;gap:0;overflow-y:auto}#battle h2{font-size:20px;font-weight:800;align-self:flex-start}
+  /* DÖVÜŞ */
+  #battle{padding:14px;align-items:center;overflow-y:auto}#battle h2{font-size:20px;font-weight:800;align-self:flex-start}
   .arena{width:100%;border-radius:20px;border:1px solid var(--line);padding:16px;background:radial-gradient(200px 120px at 70% 10%,rgba(255,122,24,.12),transparent),linear-gradient(180deg,#2a1d0d,#150d05);margin-top:10px}
   .fighter{display:flex;align-items:center;gap:12px;margin:6px 0}.fighter.enemy{flex-direction:row-reverse;text-align:right}
-  .fighter .pf{width:60px;height:60px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid var(--line)}
-  .fighter .pf img{width:100%;height:100%;object-fit:cover}
+  .fighter .pf{width:60px;height:60px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid var(--line)}.fighter .pf img{width:100%;height:100%;object-fit:cover}
   .fighter .meta{flex:1}.fighter .nm{font-size:14px;font-weight:800}
   .hpbar{height:9px;background:rgba(255,255,255,.12);border-radius:6px;overflow:hidden;margin-top:5px}
-  .hpbar i{display:block;height:100%;background:linear-gradient(90deg,#74c47a,#4fae57);transition:width .4s}
-  .hpbar.low i{background:linear-gradient(90deg,#ff6b6b,#e8590c)}
+  .hpbar i{display:block;height:100%;background:linear-gradient(90deg,#74c47a,#4fae57);transition:width .4s}.hpbar.low i{background:linear-gradient(90deg,#ff6b6b,#e8590c)}
   .vs{text-align:center;color:var(--orange);font-weight:800;font-size:13px;letter-spacing:2px;margin:4px 0}
   .log{width:100%;min-height:46px;background:rgba(0,0,0,.25);border-radius:12px;padding:10px 12px;font-size:12px;color:var(--muted);line-height:1.5;margin-top:10px}
   .pick-row{width:100%;display:flex;gap:9px;overflow-x:auto;padding:10px 0 4px}.pick-row::-webkit-scrollbar{display:none}
   .pick{flex:0 0 auto;width:66px;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:14px;padding:7px 6px;text-align:center;cursor:pointer;transition:border-color .2s,transform .15s}
   .pick.sel{border-color:var(--orange);transform:translateY(-2px)}
-  .pick .pf{width:42px;height:42px;border-radius:50%;overflow:hidden;margin:0 auto}.pick .pf img{width:100%;height:100%;object-fit:cover}
-  .pick .pn{font-size:10px;font-weight:700;margin-top:4px}
+  .pick .pf{width:42px;height:42px;border-radius:50%;overflow:hidden;margin:0 auto}.pick .pf img{width:100%;height:100%;object-fit:cover}.pick .pn{font-size:10px;font-weight:700;margin-top:4px}
   .battle-actions{width:100%;display:flex;gap:10px;margin-top:10px}
   .btn{flex:1;padding:13px;border:0;border-radius:14px;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer}
   .btn.primary{background:linear-gradient(135deg,var(--orange-lt),var(--orange-deep));color:#160f08}
@@ -116,16 +110,19 @@
   nav button .ic{font-size:21px;line-height:1}nav button.on{color:var(--orange)}nav button.on .ic{filter:drop-shadow(0 0 8px rgba(255,122,24,.6))}
   .pop{position:absolute;inset:0;z-index:80;display:none;align-items:center;justify-content:center;background:rgba(8,5,2,.72);backdrop-filter:blur(6px)}
   .pop.show{display:flex;animation:fade .25s}
-  .pop-card{width:82%;max-width:300px;background:linear-gradient(180deg,#33240f,#1e150a);border:1px solid var(--line);border-radius:26px;padding:24px 22px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.6)}
-  .pop-card .burst{animation:pop .5s cubic-bezier(.2,1.4,.4,1)}
-  .pop-card .burst .pf{width:96px;height:96px;border-radius:50%;overflow:hidden;margin:0 auto;border:3px solid var(--orange);box-shadow:0 0 0 7px rgba(255,122,24,.16)}
+  .pop-card{width:84%;max-width:310px;background:linear-gradient(180deg,#33240f,#1e150a);border:1px solid var(--line);border-radius:26px;padding:22px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.6)}
+  .pop-card .capimg{width:100%;aspect-ratio:1;border-radius:18px;overflow:hidden;margin-bottom:14px;border:2px solid var(--orange)}
+  .pop-card .capimg img{width:100%;height:100%;object-fit:cover}
+  .pop-card .burst .pf{width:96px;height:96px;border-radius:50%;overflow:hidden;margin:0 auto;border:3px solid var(--orange);box-shadow:0 0 0 7px rgba(255,122,24,.16);animation:pop .5s cubic-bezier(.2,1.4,.4,1)}
   .pop-card .burst .pf img{width:100%;height:100%;object-fit:cover}
   @keyframes pop{from{transform:scale(.3);opacity:0}to{transform:scale(1);opacity:1}}
-  .pop-card h3{font-size:22px;font-weight:800;margin:10px 0 2px}.pop-card .sub{font-size:12.5px;color:var(--muted);margin-bottom:14px}
-  .pop-rar{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;padding:4px 12px;border-radius:20px;margin-bottom:14px}
-  .pop-card .reward{font-size:13px;color:var(--orange-lt);font-weight:700;margin-bottom:16px}
-  .pop-card>button{width:100%;padding:13px;border:0;border-radius:14px;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer;background:linear-gradient(135deg,var(--orange-lt),var(--orange-deep));color:#160f08}
-  .detail .pop-card{text-align:left;padding:20px}
+  .pop-card h3{font-size:21px;font-weight:800;margin:8px 0 2px}.pop-card .sub{font-size:12.5px;color:var(--muted);margin-bottom:12px;line-height:1.4}
+  .pop-rar{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;padding:4px 12px;border-radius:20px;margin-bottom:12px}
+  .pop-card .reward{font-size:13px;color:var(--orange-lt);font-weight:700;margin-bottom:14px}
+  .pop-row{display:flex;gap:9px}
+  .pop-card button.main{flex:1;padding:13px;border:0;border-radius:14px;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer;background:linear-gradient(135deg,var(--orange-lt),var(--orange-deep));color:#160f08}
+  .pop-card button.alt{flex:1;padding:13px;border:1px solid var(--line);border-radius:14px;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer;background:rgba(255,255,255,.06);color:var(--cream)}
+  .detail .pop-card{text-align:left}
   .detail .dh{display:flex;align-items:center;gap:14px;margin-bottom:14px}
   .detail .dh .pf{width:64px;height:64px;border-radius:16px;overflow:hidden;flex-shrink:0}.detail .dh .pf img{width:100%;height:100%;object-fit:cover}
   .detail .dh h3{font-size:19px}.detail .dh .hb{font-size:11px;color:var(--muted)}
@@ -153,7 +150,7 @@
   <div class="stage">
     <section class="screen active" id="map">
       <div id="leafmap"></div>
-      <p class="map-hint"><b>Yakındaki patiler.</b> Bir kediye dokun, avı başlat.</p>
+      <p class="map-hint"><b>Yakındaki patiler.</b> Bir kediye dokun, kamerayla yakala.</p>
       <p class="geo-note" id="geoNote">Konum alınıyor…</p>
       <div class="ad" id="adBanner">
         <span class="badge">REKLAM</span>
@@ -163,20 +160,33 @@
     </section>
     <section class="screen" id="catch">
       <video id="cam" autoplay playsinline webkit-playsinline muted></video>
-      <div class="cam-sim" id="camSim"></div>
-      <div class="scrim"></div>
-      <div class="reticle"><span class="live"><span class="dot"></span><span id="camMode">AV MODU</span></span><span id="dist">3 m</span></div>
+      <canvas id="snap"></canvas>
+      <div class="cam-top"><span class="live"><span class="dot"></span><span id="camMode">Kamera</span></span><span id="dist"></span></div>
       <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
-      <div class="cam-err" id="camErr"><p id="camErrMsg"></p><button id="camRetry">Kamerayı aç</button></div>
-      <div class="wild-tag"><svg class="ic" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M21 12.8a9 9 0 1 1-9.8-9.8 7 7 0 0 0 9.8 9.8z"/></svg> <em id="wildName">Tekir</em> belirdi</div>
-      <div class="wild-wrap" id="wildWrap"></div>
-      <div class="can-label" id="canLabel">Mama kutusunu yukarı sürükle ↑</div>
-      <div class="can" id="can"><svg class="ic" viewBox="0 0 24 24" style="width:26px;height:26px"><ellipse cx="12" cy="6" rx="6" ry="2.4"/><path d="M6 6v12c0 1.3 2.7 2.4 6 2.4s6-1.1 6-2.4V6"/></svg></div>
-      <button class="scan-btn" id="scanBtn">Kediyi tara</button>
+      <div class="cam-tag" id="camTag"><svg class="ic" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M21 12.8a9 9 0 1 1-9.8-9.8 7 7 0 0 0 9.8 9.8z"/></svg> <em id="camTagName">Tekir</em> belirdi</div>
+      <div class="cam-start" id="camStart">
+        <div class="camico"><svg class="ic" viewBox="0 0 24 24"><path d="M3 8a2 2 0 0 1 2-2h2l1.5-2h7L19 6a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="12.5" r="3.4"/></svg></div>
+        <h3 id="camStartTitle">Kediyi yakala</h3>
+        <p>Kameraya bas, kediyi karşına al ve deklanşöre dokunarak fotoğrafını çek. Çektiğin foto albümüne kaydedilir.</p>
+        <button class="ob" id="openCamBtn">Kamerayı Aç</button>
+        <button class="gb" id="skipCamBtn" style="display:none">Fotoğrafsız yakala</button>
+      </div>
+      <div class="cam-err" id="camErr">
+        <p id="camErrMsg"></p>
+        <button id="camRetry">Tekrar dene</button>
+        <button class="gb" id="skipCamBtn2" style="display:none">Fotoğrafsız yakala</button>
+      </div>
+      <button class="shutter" id="shutter"></button>
     </section>
     <section class="screen" id="album">
       <div class="album-head"><h2>Pati Albümü</h2><span class="count" id="albumCount">0 / 5</span></div>
-      <div class="grid" id="grid"></div>
+      <div class="album-scroll">
+        <div class="shots-wrap" id="shotsWrap" style="display:none">
+          <div class="shots-title">Çektiklerim</div>
+          <div class="shots" id="shots"></div>
+        </div>
+        <div class="grid" id="grid"></div>
+      </div>
     </section>
     <section class="screen" id="battle">
       <h2>Sokak Kapışması</h2>
@@ -189,12 +199,12 @@
     <button data-go="album"><span class="ic"><svg class="ic" viewBox="0 0 24 24"><path d="M5 4a2 2 0 0 1 2-2h11a1 1 0 0 1 1 1v17a1 1 0 0 1-1 1H7a2 2 0 0 1-2-2z"/><path d="M5 18a2 2 0 0 1 2-2h12"/></svg></span>Albüm</button>
     <button data-go="battle"><span class="ic"><svg class="ic" viewBox="0 0 24 24"><path d="M14.5 3.5 21 10l-3 3-6.5-6.5zM3 21l6-6M6.5 17.5 3 21M9.5 14.5 13 18"/></svg></span>Dövüş</button>
   </nav>
-  <div class="pop" id="pop"><div class="pop-card">
-    <div class="burst" id="popFace"></div>
-    <h3 id="popName">Tekir</h3><div class="sub" id="popHab">Çarşı arası</div>
-    <span class="pop-rar" id="popRar">YAYGIN</span>
-    <div class="reward" id="popReward">+15 jeton · +20 XP</div>
-    <button id="popOk">Albüme ekle</button>
+  <div class="pop" id="result"><div class="pop-card">
+    <div id="resBody"></div>
+    <div class="pop-row" style="margin-top:4px">
+      <button class="alt" id="resAlbum">Albüm</button>
+      <button class="main" id="resOk">Devam</button>
+    </div>
   </div></div>
   <div class="pop detail" id="detail"><div class="pop-card">
     <div class="dh"><div class="pf" id="dFace"></div><div><h3 id="dName"></h3><div class="hb" id="dHab"></div></div></div>
@@ -203,13 +213,18 @@
     <div class="statrow"><span>SAV</span><div class="bar"><i id="bDef"></i></div><b id="vDef">0</b></div>
     <div class="statrow"><span>HIZ</span><div class="bar"><i id="bSpd"></i></div><b id="vSpd">0</b></div>
     <p class="story" id="dStory"></p>
-    <button id="dClose">Kapat</button>
+    <button class="main" id="dClose" style="width:100%">Kapat</button>
+  </div></div>
+  <div class="pop" id="viewer"><div class="pop-card">
+    <div class="capimg" id="viewerImg"></div>
+    <div class="sub" id="viewerCap"></div>
+    <button class="main" id="viewerClose" style="width:100%">Kapat</button>
   </div></div>
   <div class="pop adwatch" id="adwatch"><div class="pop-card">
     <div class="screen-ad"><span class="timer" id="adTimer">5</span><div class="ph" id="adPh">Reklam oynatılıyor…<br><small>(Yayında AdMob/AdSense ödüllü reklam buraya gelir)</small></div></div>
     <h3 style="font-size:17px">Ödüllü reklam</h3>
     <div class="sub" style="margin:4px 0 14px">İzlemeyi tamamla, jetonunu al.</div>
-    <button id="adClaim" disabled>Bekle…</button>
+    <button class="main" id="adClaim" style="width:100%" disabled>Bekle…</button>
   </div></div>
   <div class="toast" id="toast"></div>
 </div>
@@ -217,30 +232,25 @@
 <script>
 const PX="?auto=compress&cs=tinysrgb&w=600";
 const CATS=[
- {id:'tekir',name:'Tekir',rar:'yaygin',hab:'Çarşı arası',cls:'İzci',el:'Toprak',hp:62,atk:40,def:55,spd:48,fb:'#9a8a72',
-  photo:'https://images.pexels.com/photos/33585484/pexels-photo-33585484.jpeg'+PX,
-  story:'Mahallenin her köşesini ezbere bilen, kasap önünün sakin müdavimi.'},
- {id:'sarman',name:'Sarman',rar:'nadir',hab:'Balıkçı iskelesi',cls:'Korsan',el:'Ateş',hp:70,atk:62,def:44,spd:58,fb:'#ff8a3d',
-  photo:'https://images.pexels.com/photos/14572715/pexels-photo-14572715.jpeg'+PX,
-  story:'Sabah ezanından önce iskeleye inen, balıkçıların gözdesi turuncu afacan.'},
- {id:'pamuk',name:'Pamuk',rar:'ender',hab:'Cami avlusu',cls:'Şifacı',el:'Işık',hp:80,atk:38,def:72,spd:50,fb:'#e7ddcd',
-  photo:'https://images.pexels.com/photos/32727346/pexels-photo-32727346.jpeg'+PX,
-  story:'Avlunun serin mermerlerinde uyuyan, kimseden korkmayan bembeyaz bilge.'},
- {id:'zeytin',name:'Zeytin',rar:'destansi',hab:'Apartman aralığı',cls:'Gölge',el:'Karanlık',hp:88,atk:78,def:66,spd:84,fb:'#2f2a33',
-  photo:'https://images.pexels.com/photos/16412582/pexels-photo-16412582.jpeg'+PX,
-  story:'Geceleri çatılarda dolaşan, sokak lambası söndüğünde görünen kapkara hayalet.'},
- {id:'sultan',name:'Sultan',rar:'efsane',hab:'Eski hamam',cls:'Hükümdar',el:'Altın',hp:100,atk:92,def:88,spd:76,fb:'#d6a64a',
-  photo:'https://images.pexels.com/photos/30002405/pexels-photo-30002405.jpeg'+PX,
-  story:'Mahallenin efsanesi. Yıllardır kimse yakalayamadı; gören oldu mu o da meçhul.'}
+ {id:'tekir',name:'Tekir',rar:'yaygin',hab:'Çarşı arası',cls:'İzci',el:'Toprak',hp:62,atk:40,def:55,spd:48,fb:'#9a8a72',photo:'https://images.pexels.com/photos/33585484/pexels-photo-33585484.jpeg'+PX,story:'Mahallenin her köşesini ezbere bilen, kasap önünün sakin müdavimi.'},
+ {id:'sarman',name:'Sarman',rar:'nadir',hab:'Balıkçı iskelesi',cls:'Korsan',el:'Ateş',hp:70,atk:62,def:44,spd:58,fb:'#ff8a3d',photo:'https://images.pexels.com/photos/14572715/pexels-photo-14572715.jpeg'+PX,story:'Sabah ezanından önce iskeleye inen, balıkçıların gözdesi turuncu afacan.'},
+ {id:'pamuk',name:'Pamuk',rar:'ender',hab:'Cami avlusu',cls:'Şifacı',el:'Işık',hp:80,atk:38,def:72,spd:50,fb:'#e7ddcd',photo:'https://images.pexels.com/photos/32727346/pexels-photo-32727346.jpeg'+PX,story:'Avlunun serin mermerlerinde uyuyan, kimseden korkmayan bembeyaz bilge.'},
+ {id:'zeytin',name:'Zeytin',rar:'destansi',hab:'Apartman aralığı',cls:'Gölge',el:'Karanlık',hp:88,atk:78,def:66,spd:84,fb:'#2f2a33',photo:'https://images.pexels.com/photos/16412582/pexels-photo-16412582.jpeg'+PX,story:'Geceleri çatılarda dolaşan, sokak lambası söndüğünde görünen kapkara hayalet.'},
+ {id:'sultan',name:'Sultan',rar:'efsane',hab:'Eski hamam',cls:'Hükümdar',el:'Altın',hp:100,atk:92,def:88,spd:76,fb:'#d6a64a',photo:'https://images.pexels.com/photos/30002405/pexels-photo-30002405.jpeg'+PX,story:'Mahallenin efsanesi. Yıllardır kimse yakalayamadı; gören oldu mu o da meçhul.'}
 ];
 const RAR={yaygin:{tr:'YAYGIN',col:'var(--common)'},nadir:{tr:'NADİR',col:'var(--uncommon)'},ender:{tr:'ENDER',col:'var(--rare)'},destansi:{tr:'DESTANSI',col:'var(--epic)'},efsane:{tr:'EFSANE',col:'var(--legendary)'}};
-function img(cat){return `<img class="catphoto" src="${cat.photo}" alt="${cat.name}" loading="lazy" style="--fb:${cat.fb}">`;}
-let coins=120,xp=0;const caught=new Set();
-function save(){try{localStorage.setItem('patiavi',JSON.stringify({coins,xp,caught:[...caught]}));}catch(e){}}
-function load(){try{const d=JSON.parse(localStorage.getItem('patiavi'));if(d){coins=d.coins??120;xp=d.xp??0;(d.caught||[]).forEach(id=>caught.add(id));}}catch(e){}}
+const gains={yaygin:15,nadir:30,ender:55,destansi:90,efsane:150};
+function srcOf(cat){return (photos[cat.id]||cat.photo);}
+function img(cat){return `<img class="catphoto" src="${srcOf(cat)}" alt="${cat.name}" loading="lazy" style="--fb:${cat.fb}">`;}
+let coins=120,xp=0;const caught=new Set();let photos={},shots=[];
+function save(){try{localStorage.setItem('patiavi',JSON.stringify({coins,xp,caught:[...caught],photos}));}catch(e){}}
+function saveShots(){try{shots=shots.slice(-24);localStorage.setItem('patiavi_shots',JSON.stringify(shots));}catch(e){}}
+function load(){try{const d=JSON.parse(localStorage.getItem('patiavi'));if(d){coins=d.coins??120;xp=d.xp??0;(d.caught||[]).forEach(id=>caught.add(id));photos=d.photos||{};}}catch(e){}
+  try{shots=JSON.parse(localStorage.getItem('patiavi_shots')||'[]');}catch(e){shots=[];}}
 load();
 function syncCoins(){document.getElementById('coinCount').textContent=coins;save();}
 syncCoins();
+/* HARİTA */
 let map,youMarker,spawnLayer;const ISTANBUL=[41.0082,28.9784];
 function initMap(center){
   if(map)return;
@@ -257,16 +267,17 @@ function placeSpawns(center){
     const ang=(i/CATS.length)*Math.PI*2,r=0.0035+(i%3)*0.0012;
     const ll=[center[0]+Math.sin(ang)*r,center[1]+Math.cos(ang)*r];
     const m=L.marker(ll,{icon:L.divIcon({className:'cat-marker',html:`<div class="cat-pin">${img(cat)}</div>`,iconSize:[50,50]})});
-    m.on('click',()=>startCatch(cat));spawnLayer.addLayer(m);
+    m.on('click',()=>enterCamera(cat));spawnLayer.addLayer(m);
   });
 }
 function setupGeo(){
   const note=document.getElementById('geoNote');
-  if(navigator.geolocation){
-    navigator.geolocation.getCurrentPosition(
-      p=>{initMap([p.coords.latitude,p.coords.longitude]);note.textContent='📍 Gerçek konumun kullanılıyor';},
-      ()=>{initMap(ISTANBUL);note.textContent='Konum izni yok · örnek konum (İstanbul) gösteriliyor';},{timeout:6000});
-  }else{initMap(ISTANBUL);note.textContent='Konum desteklenmiyor · örnek konum gösteriliyor';}
+  if(!navigator.geolocation){initMap(ISTANBUL);note.textContent='Konum desteklenmiyor · örnek konum gösteriliyor';return;}
+  note.textContent='Konum alınıyor…';
+  navigator.geolocation.getCurrentPosition(
+    p=>{initMap([p.coords.latitude,p.coords.longitude]);note.textContent='📍 Gerçek konumun kullanılıyor';},
+    err=>{initMap(ISTANBUL);note.textContent=(err&&err.code===1)?'Konum izni kapalı · örnek konum (İstanbul) gösteriliyor':'Konum alınamadı · örnek konum gösteriliyor';},
+    {enableHighAccuracy:true,timeout:15000,maximumAge:60000});
 }
 setupGeo();
 function fixMap(){if(map)map.invalidateSize();}
@@ -274,115 +285,124 @@ window.addEventListener('load',()=>setTimeout(fixMap,300));
 window.addEventListener('resize',fixMap);
 window.addEventListener('orientationchange',()=>setTimeout(fixMap,350));
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(fixMap,200);});
+/* EKRAN */
 function show(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active',s.id===id));
   document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.go===id));
   if(id==='album')renderAlbum();
   if(id==='battle')renderBattleHome();
   if(id==='map'&&map)setTimeout(()=>map.invalidateSize(),120);
-  if(id!=='catch')stopCam();
+  if(id==='catch')enterCamera(null);else stopCam();
 }
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>show(b.dataset.go));
-let camStream=null,cocoModel=null,detLoop=null,currentWild=null;
-const camEl=document.getElementById('cam'),camSim=document.getElementById('camSim');
-const camErr=document.getElementById('camErr'),canEl=document.getElementById('can'),scanBtn=document.getElementById('scanBtn'),canLabel=document.getElementById('canLabel');
+/* KAMERA + ML */
+let camStream=null,cocoModel=null,currentWild=null;
+const camEl=document.getElementById('cam'),snap=document.getElementById('snap');
+const camStart=document.getElementById('camStart'),camErr=document.getElementById('camErr'),shutter=document.getElementById('shutter');
+const camTag=document.getElementById('camTag'),camMode=document.getElementById('camMode');
 (function loadModel(){
   const tf=document.createElement('script');tf.src='https://cdnjs.cloudflare.com/ajax/libs/tensorflow/4.22.0/tf.min.js';
   tf.onload=()=>{const co=document.createElement('script');co.src='https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3/dist/coco-ssd.min.js';
     co.onload=()=>{if(window.cocoSsd)cocoSsd.load().then(m=>cocoModel=m).catch(()=>{});};document.body.appendChild(co);};
   document.body.appendChild(tf);
 })();
-function camError(msg){
-  camErr.style.display='block';document.getElementById('camErrMsg').textContent=msg;
-  camSim.style.display='block';document.getElementById('camMode').textContent='AV MODU';
-  canEl.style.display='grid';scanBtn.style.display='none';canLabel.style.display='block';
+function enterCamera(target){
+  stopCam();currentWild=target;
+  camErr.style.display='none';shutter.style.display='none';
+  camStart.style.display='flex';
+  document.getElementById('camStartTitle').textContent=target?(target.name+' karşında'):'Sokak kedisi yakala';
+  document.getElementById('dist').textContent=target?(1+Math.floor(Math.random()*4))+' m':'';
+  if(target){camTag.style.display='block';document.getElementById('camTagName').textContent=target.name;}else camTag.style.display='none';
+  document.getElementById('skipCamBtn').style.display=target?'block':'none';
+  document.getElementById('skipCamBtn2').style.display=target?'block':'none';
 }
-function startCatch(cat){
-  currentWild=cat;
-  document.getElementById('wildName').textContent=cat.name;
-  document.getElementById('dist').textContent=(1+Math.floor(Math.random()*4))+' m';
-  document.getElementById('wildWrap').innerHTML=`<div class="wild-frame">${img(cat)}</div>`;
-  resetCan();show('catch');
-  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.go==='catch'));
-  startCam();
-}
-async function startCam(){
-  camErr.style.display='none';
-  if(!window.isSecureContext){camError('Kamera için güvenli bağlantı (https) gerekir. Siteyi https adresinden aç.');return;}
-  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){camError('Bu tarayıcı kamerayı desteklemiyor. Yakalamak için “Kediyi tara” düğmesini kullan.');return;}
+async function openCamera(){
+  camStart.style.display='none';camErr.style.display='none';
+  if(!window.isSecureContext){return camFail('Kamera için güvenli bağlantı (https) gerekir.');}
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){return camFail('Bu tarayıcı kamerayı desteklemiyor.');}
   let s=null;
   try{s=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false});}
   catch(e1){
     try{s=await navigator.mediaDevices.getUserMedia({video:true,audio:false});}
     catch(e2){
-      if(e2.name==='NotAllowedError'||e2.name==='SecurityError')camError('Kamera izni verilmedi. Ayarlar > Safari > Kamera bölümünden izin verip tekrar dene.');
-      else if(e2.name==='NotFoundError')camError('Kamera bulunamadı. “Kediyi tara” ile yine yakalayabilirsin.');
-      else camError('Kamera açılamadı ('+e2.name+'). “Kediyi tara” ile devam et.');
-      return;
+      if(e2.name==='NotAllowedError'||e2.name==='SecurityError')return camFail('Kamera izni verilmedi. Ayarlar > Safari > Kamera bölümünden izin verip tekrar dene.');
+      if(e2.name==='NotFoundError')return camFail('Kamera bulunamadı.');
+      return camFail('Kamera açılamadı ('+e2.name+').');
     }
   }
-  camStream=s;camEl.srcObject=s;camSim.style.display='none';camErr.style.display='none';
-  camEl.setAttribute('playsinline','');camEl.muted=true;
-  const tryPlay=()=>{const p=camEl.play();if(p&&p.catch)p.catch(()=>{});};
-  camEl.onloadedmetadata=tryPlay;tryPlay();setTimeout(tryPlay,300);
-  document.getElementById('camMode').textContent=cocoModel?'KEDİ TANIMA':'AV MODU';
-  showCatchControls();
+  camStream=s;camEl.srcObject=s;camEl.setAttribute('playsinline','');camEl.muted=true;
+  const play=()=>{const p=camEl.play();if(p&&p.catch)p.catch(()=>{});};
+  camEl.onloadedmetadata=play;play();setTimeout(play,300);
+  shutter.style.display='block';
+  camMode.textContent=cocoModel?'Kedi tanıma hazır':'Kamera açık';
 }
-document.getElementById('camRetry').onclick=()=>startCam();
-function stopCam(){
-  if(detLoop){cancelAnimationFrame(detLoop);detLoop=null;}
-  if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null;}
-  camEl.srcObject=null;
-}
-function showCatchControls(){canEl.style.display='grid';canLabel.style.display='block';scanBtn.style.display='none';}
-async function detectCat(){
-  if(!cocoModel||!camStream)return null;
-  try{const preds=await cocoModel.detect(camEl,3);
-    const c=preds.find(p=>['cat','dog','teddy bear','bird'].includes(p.class));
-    return c?Math.round(c.score*100):null;
-  }catch(e){return null;}
-}
-const can=document.getElementById('can');let dragging=false,sx=0,sy=0;
-function resetCan(){can.style.transition='none';can.style.transform='translateX(-50%)';can.style.opacity='1';can.style.bottom='158px';}
-function pDown(e){dragging=true;const p=e.touches?e.touches[0]:e;sx=p.clientX;sy=p.clientY;can.style.transition='none';can.style.cursor='grabbing';}
-function pMove(e){if(!dragging)return;e.preventDefault();const p=e.touches?e.touches[0]:e;can.style.transform=`translateX(-50%) translate(${p.clientX-sx}px,${p.clientY-sy}px)`;}
-function pUp(e){if(!dragging)return;dragging=false;can.style.cursor='grab';const p=e.changedTouches?e.changedTouches[0]:e;
-  if(p.clientY-sy<-80)throwCan();else{can.style.transition='transform .25s';resetCan();}}
-can.addEventListener('mousedown',pDown);can.addEventListener('touchstart',pDown,{passive:false});
-window.addEventListener('mousemove',pMove);window.addEventListener('touchmove',pMove,{passive:false});
-window.addEventListener('mouseup',pUp);window.addEventListener('touchend',pUp);
-function throwCan(){can.style.transition='transform .45s cubic-bezier(.3,.8,.4,1),opacity .45s';
-  can.style.transform='translateX(-50%) translateY(-300px) scale(.5)';can.style.opacity='0';hitAndReveal();}
-function hitAndReveal(){const w=document.getElementById('wildWrap');w.classList.add('hit');
-  detectCat().then(conf=>{setTimeout(()=>{w.classList.remove('hit');reveal(currentWild,conf);},500);});}
-function reveal(cat,conf){
-  const gains={yaygin:15,nadir:30,ender:55,destansi:90,efsane:150},g=gains[cat.rar];
-  coins+=g;xp+=20;caught.add(cat.id);syncCoins();
-  document.getElementById('popFace').innerHTML=`<div class="pf">${img(cat)}</div>`;
-  document.getElementById('popName').textContent=cat.name;
-  document.getElementById('popHab').textContent=(conf?('Gerçek kedi algılandı %'+conf+' · '):'')+cat.hab;
-  const r=RAR[cat.rar],pr=document.getElementById('popRar');
-  pr.textContent=r.tr;pr.style.background=r.col;pr.style.color='#160f08';
-  document.getElementById('popReward').textContent=`+${g} jeton · +20 XP`;
-  document.getElementById('pop').classList.add('show');
-}
-document.getElementById('popOk').onclick=()=>{
-  document.getElementById('pop').classList.remove('show');stopCam();
-  if(map){const c=youMarker?youMarker.getLatLng():{lat:ISTANBUL[0],lng:ISTANBUL[1]};placeSpawns([c.lat,c.lng]);}
-  if(caught.size===CATS.length)toast('🏆 Tüm patiler yakalandı!');
-  show('album');
+function camFail(msg){camErr.style.display='flex';document.getElementById('camErrMsg').textContent=msg;shutter.style.display='none';camStart.style.display='none';}
+function stopCam(){if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null;}camEl.srcObject=null;}
+document.getElementById('openCamBtn').onclick=openCamera;
+document.getElementById('camRetry').onclick=openCamera;
+document.getElementById('skipCamBtn').onclick=()=>{if(currentWild)catchNamed(currentWild,null,null);};
+document.getElementById('skipCamBtn2').onclick=()=>{if(currentWild)catchNamed(currentWild,null,null);};
+/* DEKLANŞÖR */
+shutter.onclick=async()=>{
+  if(!camStream)return;
+  const vw=camEl.videoWidth,vh=camEl.videoHeight;if(!vw){toast('Kamera hazırlanıyor…');return;}
+  shutter.disabled=true;
+  const maxW=720,scale=Math.min(1,maxW/vw),cw=Math.round(vw*scale),ch=Math.round(vh*scale);
+  snap.width=cw;snap.height=ch;snap.getContext('2d').drawImage(camEl,0,0,cw,ch);
+  let data='';try{data=snap.toDataURL('image/jpeg',0.72);}catch(e){}
+  let conf=null;
+  if(cocoModel){try{const preds=await cocoModel.detect(snap,5);const c=preds.find(p=>['cat','dog','teddy bear'].includes(p.class));conf=c?Math.round(c.score*100):null;}catch(e){}}
+  shutter.disabled=false;
+  if(currentWild)catchNamed(currentWild,data,conf);
+  else catchFree(data,conf);
 };
+function catchNamed(cat,data,conf){
+  caught.add(cat.id);if(data)photos[cat.id]=data;coins+=gains[cat.rar];xp+=20;syncCoins();stopCam();
+  const r=RAR[cat.rar];
+  document.getElementById('resBody').innerHTML=`
+    ${data?`<div class="capimg"><img src="${data}"></div>`:`<div class="burst"><div class="pf">${img(cat)}</div></div>`}
+    <h3>${cat.name}</h3>
+    <div class="sub">${conf?('Gerçek kedi algılandı %'+conf+' · '):''}${cat.hab}</div>
+    <span class="pop-rar" style="background:${r.col};color:#160f08">${r.tr}</span>
+    <div class="reward">+${gains[cat.rar]} jeton · +20 XP</div>`;
+  document.getElementById('result').classList.add('show');
+}
+function catchFree(data,conf){
+  coins+=10;xp+=10;syncCoins();
+  shots.push({img:data,ts:Date.now(),conf});saveShots();stopCam();
+  document.getElementById('resBody').innerHTML=`
+    <div class="capimg"><img src="${data}"></div>
+    <h3>Sokak kedisi</h3>
+    <div class="sub">${conf?('Gerçek kedi algılandı %'+conf+' · '):''}Çektiklerim albümüne kaydedildi.</div>
+    <div class="reward">+10 jeton · +10 XP</div>`;
+  document.getElementById('result').classList.add('show');
+}
+document.getElementById('resOk').onclick=()=>{document.getElementById('result').classList.remove('show');
+  if(map){const c=youMarker?youMarker.getLatLng():{lat:ISTANBUL[0],lng:ISTANBUL[1]};placeSpawns([c.lat,c.lng]);}
+  enterCamera(null);};
+document.getElementById('resAlbum').onclick=()=>{document.getElementById('result').classList.remove('show');
+  if(map){const c=youMarker?youMarker.getLatLng():{lat:ISTANBUL[0],lng:ISTANBUL[1]};placeSpawns([c.lat,c.lng]);}
+  show('album');};
+/* ALBÜM */
 const grid=document.getElementById('grid');
 function renderAlbum(){
-  grid.innerHTML='';document.getElementById('albumCount').textContent=`${caught.size} / ${CATS.length}`;
+  document.getElementById('albumCount').textContent=`${caught.size} / ${CATS.length}`;
+  const sw=document.getElementById('shotsWrap'),sc=document.getElementById('shots');
+  if(shots.length){sw.style.display='block';sc.innerHTML='';
+    [...shots].reverse().forEach(s=>{const d=document.createElement('div');d.className='shot';
+      d.innerHTML=`<img src="${s.img}">`+(s.conf?`<span class="ok">%${s.conf}</span>`:'');
+      d.onclick=()=>openViewer(s);sc.appendChild(d);});
+  }else sw.style.display='none';
+  grid.innerHTML='';
   CATS.forEach((cat,i)=>{
-    const got=caught.has(cat.id),r=RAR[cat.rar],serial='#'+String(i+1).padStart(4,'0');
+    const got=caught.has(cat.id),r=RAR[cat.rar],serial='#'+String(i+1).padStart(4,'0'),own=!!photos[cat.id];
     const card=document.createElement('div');card.className='card'+(got?'':' locked');
     card.innerHTML=`
       <div class="photo">
         <span class="serial">${got?serial:'#????'}</span>
         <span class="rar" style="background:${r.col};color:#160f08">${got?r.tr:'???'}</span>
         ${got?img(cat):'<span class="q">?</span>'}
+        ${own?'<span class="yours">senin fotoğrafın</span>':''}
       </div>
       <div class="nm">${got?cat.name:'?????'}</div>
       <div class="hb">${got?cat.hab:'Henüz bulunamadı'}</div>
@@ -396,6 +416,12 @@ function renderAlbum(){
     grid.appendChild(card);
   });
 }
+function openViewer(s){
+  document.getElementById('viewerImg').innerHTML=`<img src="${s.img}">`;
+  const d=new Date(s.ts);document.getElementById('viewerCap').textContent=(s.conf?('Gerçek kedi %'+s.conf+' · '):'')+d.toLocaleDateString('tr-TR')+' '+d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('viewer').classList.add('show');
+}
+document.getElementById('viewerClose').onclick=()=>document.getElementById('viewer').classList.remove('show');
 function openDetail(cat,serial){
   document.getElementById('dFace').innerHTML=img(cat);
   document.getElementById('dName').textContent=cat.name;
@@ -408,6 +434,7 @@ function openDetail(cat,serial){
   document.getElementById('detail').classList.add('show');
 }
 document.getElementById('dClose').onclick=()=>document.getElementById('detail').classList.remove('show');
+/* DÖVÜŞ */
 const battleBody=document.getElementById('battleBody');let myFighter=null,enemy=null,busy=false;
 function renderBattleHome(){
   const mine=CATS.filter(c=>caught.has(c.id));
@@ -460,6 +487,7 @@ function attack(){
   };
   step();
 }
+/* REKLAM */
 document.getElementById('adBanner').onclick=()=>{
   const m=document.getElementById('adwatch'),t=document.getElementById('adTimer'),btn=document.getElementById('adClaim');
   m.classList.add('show');let s=5;t.textContent=s;btn.disabled=true;btn.textContent='Bekle…';
