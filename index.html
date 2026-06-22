@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Pati Avı</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+  :root{
+    --orange:#ff7a18;--orange-lt:#ff9a44;--orange-deep:#e8590c;
+    --bg:#160f08;--cream:#fbf2e6;--muted:#b59b7c;--line:rgba(255,154,68,.16);
+    --common:#b0a08a;--uncommon:#74c47a;--rare:#5aa8ff;--epic:#c07bff;--legendary:#ffcf4a;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{font-family:'Trebuchet MS','Segoe UI',system-ui,sans-serif;background:#0b0805;color:var(--cream);
+    display:flex;align-items:center;justify-content:center;min-height:100dvh;padding:14px}
+  svg.ic{width:1em;height:1em;display:inline-block;vertical-align:-.12em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .phone{width:100%;max-width:390px;height:min(844px,95dvh);background:linear-gradient(180deg,var(--bg),#0d0904);
+    border-radius:38px;overflow:hidden;position:relative;display:flex;flex-direction:column;
+    box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 0 10px #060402,0 0 0 12px #3a2a12}
+  .notch{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:120px;height:26px;background:#060402;border-radius:0 0 16px 16px;z-index:60}
+  header{padding:34px 18px 12px;display:flex;align-items:center;justify-content:space-between;position:relative;z-index:30}
+  .brand{display:flex;align-items:center;gap:9px}
+  .brand .logo{width:34px;height:34px;border-radius:11px;background:radial-gradient(circle at 30% 25%,var(--orange-lt),var(--orange-deep));
+    display:grid;place-items:center;box-shadow:0 4px 14px rgba(255,122,24,.45);color:#fff}
+  .brand b{font-size:17px;letter-spacing:.3px}.brand span{color:var(--orange);font-weight:800}
+  .coins{display:flex;align-items:center;gap:6px;background:rgba(255,122,24,.1);border:1px solid var(--line);
+    padding:6px 12px;border-radius:30px;font-size:13px;font-weight:800;color:var(--orange-lt)}.coins .ic{font-size:15px}
+  .stage{flex:1;position:relative;overflow:hidden}
+  .screen{position:absolute;inset:0;display:none;flex-direction:column}
+  .screen.active{display:flex;animation:fade .3s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  #leafmap{flex:1;margin:4px 14px 0;border-radius:22px;overflow:hidden;border:1px solid var(--line);background:#241a0c}
+  .leaflet-container{background:#241a0c;font-family:inherit}
+  .cat-marker{font-size:0;background:none;border:none}
+  .cat-pin{width:46px;height:46px;display:grid;place-items:center;border-radius:50%;
+    background:radial-gradient(circle at 50% 35%,rgba(255,122,24,.32),rgba(255,122,24,.05));
+    border:1px solid rgba(255,122,24,.5);animation:bob 2.6s ease-in-out infinite;cursor:pointer}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+  .you-pin{width:18px;height:18px;background:var(--orange);border-radius:50%;box-shadow:0 0 0 6px rgba(255,122,24,.22),0 0 0 13px rgba(255,122,24,.08)}
+  .map-hint{margin:10px 16px 0;font-size:12.5px;color:var(--muted);text-align:center;line-height:1.5}.map-hint b{color:var(--cream)}
+  .geo-note{margin:6px 16px 0;font-size:10.5px;color:var(--muted);text-align:center;opacity:.7}
+  .ad{margin:10px 14px 0;border:1px dashed rgba(255,154,68,.3);border-radius:14px;padding:10px 12px;display:flex;align-items:center;gap:10px;background:rgba(255,122,24,.05);cursor:pointer}
+  .ad .badge{font-size:8px;font-weight:800;letter-spacing:.5px;color:#160f08;background:var(--muted);padding:2px 5px;border-radius:4px}
+  .ad .txt{flex:1;font-size:11.5px;color:var(--muted);line-height:1.3}.ad .txt b{color:var(--cream)}
+  .ad .go{font-size:11px;font-weight:800;color:var(--orange-lt);white-space:nowrap}
+  #catch{align-items:center;justify-content:flex-end;position:relative;background:#0d0904}
+  #cam{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+  .cam-sim{position:absolute;inset:0;background:radial-gradient(300px 200px at 50% 16%,rgba(255,122,24,.18),transparent),linear-gradient(180deg,#2a1d0d,#100a05)}
+  .cam-sim::before{content:"";position:absolute;inset:0;opacity:.5;background:repeating-linear-gradient(120deg,transparent 0 22px,rgba(255,255,255,.02) 22px 24px)}
+  .scrim{position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.35),transparent 30%,transparent 60%,rgba(0,0,0,.55))}
+  .reticle{position:absolute;top:18px;left:14px;right:14px;display:flex;justify-content:space-between;align-items:center;color:rgba(255,255,255,.65);font-size:11px;font-weight:800;letter-spacing:1px;z-index:6}
+  .reticle .live{display:flex;align-items:center;gap:6px}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--orange);box-shadow:0 0 8px var(--orange);animation:blink 1.4s infinite}
+  @keyframes blink{50%{opacity:.3}}
+  .corner{position:absolute;width:26px;height:26px;border:2px solid rgba(255,255,255,.3);z-index:6}
+  .corner.tl{top:50px;left:18px;border-right:0;border-bottom:0}.corner.tr{top:50px;right:18px;border-left:0;border-bottom:0}
+  .corner.bl{bottom:150px;left:18px;border-right:0;border-top:0}.corner.br{bottom:150px;right:18px;border-left:0;border-top:0}
+  .detbox{position:absolute;border:2px solid var(--orange);border-radius:8px;z-index:5;display:none}
+  .detbox span{position:absolute;top:-20px;left:-2px;background:var(--orange);color:#160f08;font-size:10px;font-weight:800;padding:1px 7px;border-radius:5px}
+  .wild-wrap{position:absolute;top:32%;left:50%;transform:translate(-50%,-50%);z-index:4;transition:transform .25s}
+  .wild-wrap.hit{animation:wobble .5s}
+  @keyframes wobble{0%,100%{transform:translate(-50%,-50%)}25%{transform:translate(-58%,-50%) rotate(-8deg)}75%{transform:translate(-42%,-50%) rotate(8deg)}}
+  .wild-wrap svg{width:118px;height:118px;filter:drop-shadow(0 12px 20px rgba(0,0,0,.55))}
+  .wild-tag{position:absolute;top:13%;left:50%;transform:translateX(-50%);z-index:5;background:rgba(0,0,0,.5);border:1px solid var(--line);padding:5px 14px;border-radius:30px;font-size:12px;font-weight:700}
+  .wild-tag em{font-style:normal;color:var(--orange-lt)}
+  .can{position:absolute;bottom:158px;left:50%;transform:translateX(-50%);width:58px;height:58px;border-radius:16px;z-index:8;cursor:grab;touch-action:none;
+    background:linear-gradient(160deg,var(--orange-lt),var(--orange-deep));display:grid;place-items:center;box-shadow:0 8px 20px rgba(232,89,12,.5);border:2px solid rgba(255,255,255,.3);user-select:none;color:#fff}
+  .can-label{position:absolute;bottom:128px;left:0;right:0;text-align:center;font-size:11px;color:rgba(255,255,255,.85);z-index:8;pointer-events:none;text-shadow:0 1px 3px #000}
+  .scan-btn{position:absolute;bottom:158px;left:50%;transform:translateX(-50%);z-index:8;display:none;background:var(--orange);color:#160f08;border:0;font-family:inherit;font-weight:800;font-size:13px;padding:13px 22px;border-radius:30px;cursor:pointer;box-shadow:0 8px 20px rgba(255,122,24,.5)}
+  #album{padding:14px 0}
+  .album-head{padding:0 18px 10px;display:flex;align-items:baseline;justify-content:space-between}
+  .album-head h2{font-size:20px;font-weight:800}.album-head .count{font-size:12px;color:var(--muted)}
+  .grid{flex:1;overflow-y:auto;padding:2px 14px 16px;display:grid;grid-template-columns:1fr 1fr;gap:11px}.grid::-webkit-scrollbar{display:none}
+  .card{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:18px;padding:13px 12px;position:relative;overflow:hidden;cursor:pointer;transition:transform .15s}
+  .card:active{transform:scale(.97)}.card.locked{opacity:.4;filter:grayscale(.7)}
+  .card .face{text-align:center;margin:4px 0 8px}.card .face svg{width:54px;height:54px;filter:drop-shadow(0 6px 10px rgba(0,0,0,.4))}
+  .card .nm{font-size:14px;font-weight:800}.card .hb{font-size:10.5px;color:var(--muted);margin-top:1px}
+  .rar{position:absolute;top:9px;right:9px;font-size:8.5px;font-weight:800;letter-spacing:.6px;padding:3px 7px;border-radius:20px;text-transform:uppercase}
+  .serial{position:absolute;top:11px;left:11px;font-size:9px;color:var(--muted);font-weight:700}
+  .card .stats{display:flex;gap:6px;margin-top:9px}
+  .pip{flex:1;height:4px;border-radius:4px;background:rgba(255,255,255,.1);overflow:hidden}.pip i{display:block;height:100%}
+  #battle{padding:14px;align-items:center;gap:10px;overflow-y:auto}#battle h2{font-size:20px;font-weight:800;align-self:flex-start}
+  .arena{width:100%;border-radius:20px;border:1px solid var(--line);padding:16px;background:radial-gradient(200px 120px at 70% 10%,rgba(255,122,24,.12),transparent),linear-gradient(180deg,#2a1d0d,#150d05);margin-top:10px}
+  .fighter{display:flex;align-items:center;gap:12px;margin:6px 0}.fighter.enemy{flex-direction:row-reverse;text-align:right}
+  .fighter svg{width:64px;height:64px;flex-shrink:0}.fighter .meta{flex:1}.fighter .nm{font-size:14px;font-weight:800}
+  .hpbar{height:9px;background:rgba(255,255,255,.12);border-radius:6px;overflow:hidden;margin-top:5px}
+  .hpbar i{display:block;height:100%;background:linear-gradient(90deg,#74c47a,#4fae57);transition:width .4s}
+  .hpbar.low i{background:linear-gradient(90deg,#ff6b6b,#e8590c)}
+  .vs{text-align:center;color:var(--orange);font-weight:800;font-size:13px;letter-spacing:2px;margin:4px 0}
+  .log{width:100%;min-height:46px;background:rgba(0,0,0,.25);border-radius:12px;padding:10px 12px;font-size:12px;color:var(--muted);line-height:1.5;margin-top:10px}
+  .pick-row{width:100%;display:flex;gap:9px;overflow-x:auto;padding-bottom:4px}.pick-row::-webkit-scrollbar{display:none}
+  .pick{flex:0 0 auto;width:74px;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:14px;padding:9px 6px;text-align:center;cursor:pointer;transition:border-color .2s,transform .15s}
+  .pick.sel{border-color:var(--orange);transform:translateY(-2px)}.pick svg{width:36px;height:36px}.pick .pn{font-size:10px;font-weight:700;margin-top:3px}
+  .battle-actions{width:100%;display:flex;gap:10px;margin-top:10px}
+  .btn{flex:1;padding:13px;border:0;border-radius:14px;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer}
+  .btn.primary{background:linear-gradient(135deg,var(--orange-lt),var(--orange-deep));color:#160f08}
+  .btn.ghost{background:rgba(255,255,255,.07);color:var(--cream);border:1px solid var(--line)}.btn:disabled{opacity:.4;cursor:not-allowed}
+  .empty{width:100%;text-align:center;color:var(--muted);font-size:13px;padding:30px 10px;line-height:1.6}
+  nav{display:flex;background:rgba(11,8,5,.9);border-top:1px solid var(--line);backdrop-filter:blur(10px);padding:9px 4px calc(9px + env(safe-area-inset-bottom))}
+  nav button{flex:1;background:none;border:0;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;font-size:9.5px;font-weight:700;padding:6px 0;cursor:pointer;font-family:inherit}
+  nav button .ic{font-size:21px;line-height:1}nav button.on{color:var(--orange)}nav button.on .ic{filter:drop-shadow(0 0 8px rgba(255,122,24,.6))}
+  .pop{position:absolute;inset:0;z-index:80;display:none;align-items:center;justify-content:center;background:rgba(8,5,2,.72);backdrop-filter:blur(6px)}
+  .pop.show{display:flex;animation:fade .25s}
+  .pop-card{width:82%;max-width:300px;background:linear-gradient(180deg,#33240f,#1e150a);border:1px solid var(--line);border-radius:26px;padding:24px 22px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.6)}
+  .pop-card .burst{animation:pop .5s cubic-bezier(.2,1.4,.4,1)}.pop-card .burst svg{width:78px;height:78px}
+  @keyframes pop{from{transform:scale(.3);opacity:0}to{transform:scale(1);opacity:1}}
+  .pop-card h3{font-size:22px;font-weight:800;margin:8px 0 2px}.pop-card .sub{font-size:12.5px;color:var(--muted);margin-bottom:14px}
+  .pop-rar{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;padding:4px 12px;border-radius:20px;margin-bottom:14px}
+  .pop-card .reward{font-size:13px;color:var(--orange-lt);font-weight:700;margin-bottom:16px}
+  .pop-card>button{width:100%;padding:13px;border:0;border-radius:14px;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer;background:linear-gradient(135deg,var(--orange-lt),var(--orange-deep));color:#160f08}
+  .detail .pop-card{text-align:left;padding:22px}
+  .detail .dh{display:flex;align-items:center;gap:14px;margin-bottom:14px}.detail .dh svg{width:58px;height:58px;flex-shrink:0}
+  .detail .dh h3{font-size:19px}.detail .dh .hb{font-size:11px;color:var(--muted)}
+  .statrow{display:flex;align-items:center;margin:9px 0;font-size:12px}.statrow span{color:var(--muted);font-weight:700;width:42px}
+  .bar{flex:1;height:7px;background:rgba(255,255,255,.1);border-radius:6px;margin:0 10px;overflow:hidden}.bar i{display:block;height:100%;border-radius:6px}
+  .statrow b{width:26px;text-align:right}
+  .story{font-size:12px;color:var(--muted);line-height:1.55;margin:14px 0 4px;font-style:italic}
+  .adwatch .screen-ad{height:150px;border-radius:14px;background:linear-gradient(135deg,#3a2a12,#241808);display:grid;place-items:center;margin-bottom:14px;position:relative;overflow:hidden}
+  .adwatch .screen-ad .ph{color:var(--muted);font-size:12px;text-align:center;padding:0 16px;line-height:1.5}
+  .adwatch .timer{position:absolute;top:8px;right:10px;font-size:11px;font-weight:800;color:var(--orange-lt);background:rgba(0,0,0,.4);padding:2px 8px;border-radius:20px}
+  .toast{position:absolute;bottom:86px;left:50%;transform:translateX(-50%);z-index:90;background:rgba(33,22,8,.96);border:1px solid var(--line);padding:10px 18px;border-radius:30px;font-size:12.5px;font-weight:700;opacity:0;transition:opacity .3s,transform .3s;pointer-events:none;max-width:80%;text-align:center}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(-6px)}
+</style>
+</head>
+<body>
+<div class="phone">
+  <div class="notch"></div>
+  <header>
+    <div class="brand">
+      <div class="logo"><svg class="ic" viewBox="0 0 24 24" style="width:20px;height:20px"><circle cx="6" cy="10" r="1.6"/><circle cx="10" cy="7" r="1.6"/><circle cx="14" cy="7" r="1.6"/><circle cx="18" cy="10" r="1.6"/><path d="M12 12c-2.5 0-4.5 2-4.5 4.2 0 1.5 1.2 2.3 2.6 1.9 1.2-.35 2.6-.35 3.8 0 1.4.4 2.6-.4 2.6-1.9C16.5 14 14.5 12 12 12z"/></svg></div>
+      <b>Pati<span>Avı</span></b>
+    </div>
+    <div class="coins"><svg class="ic" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 8v8M9.5 10.5h3.5a1.5 1.5 0 0 1 0 3H9.5"/></svg><span id="coinCount">120</span></div>
+  </header>
+  <div class="stage">
+    <section class="screen active" id="map">
+      <div id="leafmap"></div>
+      <p class="map-hint"><b>Yakındaki patiler.</b> Bir kediye dokun, avı başlat.</p>
+      <p class="geo-note" id="geoNote">Konum alınıyor…</p>
+      <div class="ad" id="adBanner">
+        <span class="badge">REKLAM</span>
+        <div class="txt"><b>Mama Köşkü</b> · Reklamı izle, sokak dostlarına mama bağışla, <b>+30 jeton</b> kazan.</div>
+        <span class="go">İzle →</span>
+      </div>
+    </section>
+    <section class="screen" id="catch">
+      <video id="cam" autoplay playsinline muted></video>
+      <div class="cam-sim" id="camSim"></div>
+      <div class="scrim"></div>
+      <div class="reticle"><span class="live"><span class="dot"></span><span id="camMode">AV MODU</span></span><span id="dist">3 m</span></div>
+      <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
+      <div class="detbox" id="detbox"><span id="detlabel">kedi</span></div>
+      <div class="wild-tag"><svg class="ic" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M21 12.8a9 9 0 1 1-9.8-9.8 7 7 0 0 0 9.8 9.8z"/></svg> <em id="wildName">Tekir</em> belirdi</div>
+      <div class="wild-wrap" id="wildWrap"></div>
+      <div class="can-label" id="canLabel">Mama kutusunu yukarı sürükle ↑</div>
+      <div class="can" id="can"><svg class="ic" viewBox="0 0 24 24" style="width:26px;height:26px"><ellipse cx="12" cy="6" rx="6" ry="2.4"/><path d="M6 6v12c0 1.3 2.7 2.4 6 2.4s6-1.1 6-2.4V6"/></svg></div>
+      <button class="scan-btn" id="scanBtn">Kediyi tara</button>
+    </section>
+    <section class="screen" id="album">
+      <div class="album-head"><h2>Pati Albümü</h2><span class="count" id="albumCount">0 / 5</span></div>
+      <div class="grid" id="grid"></div>
+    </section>
+    <section class="screen" id="battle">
+      <h2>Sokak Kapışması</h2>
+      <div id="battleBody" style="width:100%"></div>
+    </section>
+  </div>
+  <nav>
+    <button class="on" data-go="map"><span class="ic"><svg class="ic" viewBox="0 0 24 24"><path d="M9 3 3 5v16l6-2 6 2 6-2V3l-6 2-6-2z"/><path d="M9 3v16M15 5v16"/></svg></span>Harita</button>
+    <button data-go="catch"><span class="ic"><svg class="ic" viewBox="0 0 24 24"><path d="M3 8a2 2 0 0 1 2-2h2l1.5-2h7L19 6a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="12.5" r="3.2"/></svg></span>Av</button>
+    <button data-go="album"><span class="ic"><svg class="ic" viewBox="0 0 24 24"><path d="M5 4a2 2 0 0 1 2-2h11a1 1 0 0 1 1 1v17a1 1 0 0 1-1 1H7a2 2 0 0 1-2-2z"/><path d="M5 18a2 2 0 0 1 2-2h12"/></svg></span>Albüm</button>
+    <button data-go="battle"><span class="ic"><svg class="ic" viewBox="0 0 24 24"><path d="M14.5 3.5 21 10l-3 3-6.5-6.5zM3 21l6-6M6.5 17.5 3 21M9.5 14.5 13 18"/></svg></span>Dövüş</button>
+  </nav>
+  <div class="pop" id="pop"><div class="pop-card">
+    <div class="burst" id="popFace"></div>
+    <h3 id="popName">Tekir</h3><div class="sub" id="popHab">Çarşı arası</div>
+    <span class="pop-rar" id="popRar">YAYGIN</span>
+    <div class="reward" id="popReward">+15 jeton · +20 XP</div>
+    <button id="popOk">Albüme ekle</button>
+  </div></div>
+  <div class="pop detail" id="detail"><div class="pop-card">
+    <div class="dh"><div id="dFace"></div><div><h3 id="dName"></h3><div class="hb" id="dHab"></div></div></div>
+    <div class="statrow"><span>CAN</span><div class="bar"><i id="bHp"></i></div><b id="vHp">0</b></div>
+    <div class="statrow"><span>SAL</span><div class="bar"><i id="bAtk"></i></div><b id="vAtk">0</b></div>
+    <div class="statrow"><span>SAV</span><div class="bar"><i id="bDef"></i></div><b id="vDef">0</b></div>
+    <div class="statrow"><span>HIZ</span><div class="bar"><i id="bSpd"></i></div><b id="vSpd">0</b></div>
+    <p class="story" id="dStory"></p>
+    <button id="dClose">Kapat</button>
+  </div></div>
+  <div class="pop adwatch" id="adwatch"><div class="pop-card">
+    <div class="screen-ad"><span class="timer" id="adTimer">5</span><div class="ph" id="adPh">Reklam oynatılıyor…<br><small>(Yayında AdMob/AdSense ödüllü reklam buraya gelir)</small></div></div>
+    <h3 style="font-size:17px">Ödüllü reklam</h3>
+    <div class="sub" style="margin:4px 0 14px">İzlemeyi tamamla, jetonunu al.</div>
+    <button id="adClaim" disabled>Bekle…</button>
+  </div></div>
+  <div class="toast" id="toast"></div>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+function catSVG(c){
+  return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <ellipse cx="50" cy="92" rx="26" ry="6" fill="rgba(0,0,0,.25)"/>
+    <path d="M22 40 L16 16 L38 32 Z" fill="${c.body}" stroke="${c.ear}" stroke-width="2"/>
+    <path d="M78 40 L84 16 L62 32 Z" fill="${c.body}" stroke="${c.ear}" stroke-width="2"/>
+    <path d="M24 18 L20 24 L31 30 Z" fill="${c.accent}"/><path d="M76 18 L80 24 L69 30 Z" fill="${c.accent}"/>
+    <circle cx="50" cy="56" r="30" fill="${c.body}"/>
+    ${c.stripe?`<path d="M50 30 q-6 14 0 28 M38 34 q-4 10 0 20 M62 34 q4 10 0 20" stroke="${c.ear}" stroke-width="3" fill="none" opacity=".5"/>`:''}
+    <circle cx="39" cy="52" r="5.5" fill="#fff"/><circle cx="61" cy="52" r="5.5" fill="#fff"/>
+    <circle cx="39.5" cy="53" r="3" fill="#1c130a"/><circle cx="60.5" cy="53" r="3" fill="#1c130a"/>
+    <path d="M50 60 l-3 3 h6 z" fill="${c.accent}"/>
+    <path d="M50 63 q-4 4 -9 3 M50 63 q4 4 9 3" stroke="${c.ear}" stroke-width="2" fill="none"/>
+    <path d="M30 58 h-14 M30 63 h-13 M70 58 h14 M70 63 h13" stroke="${c.ear}" stroke-width="1.5" opacity=".6"/>
+    ${c.crown?`<path d="M36 26 l4 8 5-7 5 7 5-7 5 7 4-8 -2 12 h-26 z" fill="#ffcf4a" stroke="#e8a800" stroke-width="1.5"/>`:''}
+  </svg>`;
+}
+const RAR={yaygin:{tr:'YAYGIN',col:'var(--common)'},nadir:{tr:'NADİR',col:'var(--uncommon)'},ender:{tr:'ENDER',col:'var(--rare)'},destansi:{tr:'DESTANSI',col:'var(--epic)'},efsane:{tr:'EFSANE',col:'var(--legendary)'}};
+const CATS=[
+ {id:'tekir',name:'Tekir',rar:'yaygin',hab:'Çarşı arası',cls:'İzci',el:'Toprak',hp:62,atk:40,def:55,spd:48,art:{body:'#9a8a72',ear:'#6e6051',accent:'#ffb38a',stripe:true},story:'Mahallenin her köşesini ezbere bilen, kasap önünün sakin müdavimi.'},
+ {id:'sarman',name:'Sarman',rar:'nadir',hab:'Balıkçı iskelesi',cls:'Korsan',el:'Ateş',hp:70,atk:62,def:44,spd:58,art:{body:'#ff8a3d',ear:'#d8631c',accent:'#ffd0a0',stripe:true},story:'Sabah ezanından önce iskeleye inen, balıkçıların gözdesi turuncu afacan.'},
+ {id:'pamuk',name:'Pamuk',rar:'ender',hab:'Cami avlusu',cls:'Şifacı',el:'Işık',hp:80,atk:38,def:72,spd:50,art:{body:'#f3ece1',ear:'#cdbfac',accent:'#ffc1c1'},story:'Avlunun serin mermerlerinde uyuyan, kimseden korkmayan bembeyaz bilge.'},
+ {id:'zeytin',name:'Zeytin',rar:'destansi',hab:'Apartman aralığı',cls:'Gölge',el:'Karanlık',hp:88,atk:78,def:66,spd:84,art:{body:'#2f2a33',ear:'#1b181f',accent:'#7be0c0'},story:'Geceleri çatılarda dolaşan, sokak lambası söndüğünde görünen kapkara hayalet.'},
+ {id:'sultan',name:'Sultan',rar:'efsane',hab:'Eski hamam',cls:'Hükümdar',el:'Altın',hp:100,atk:92,def:88,spd:76,art:{body:'#e8b24a',ear:'#b8841f',accent:'#fff0c0',stripe:true,crown:true},story:'Mahallenin efsanesi. Yıllardır kimse yakalayamadı; gören oldu mu o da meçhul.'}
+];
+let coins=120,xp=0;const caught=new Set();
+function save(){try{localStorage.setItem('patiavi',JSON.stringify({coins,xp,caught:[...caught]}));}catch(e){}}
+function load(){try{const d=JSON.parse(localStorage.getItem('patiavi'));if(d){coins=d.coins??120;xp=d.xp??0;(d.caught||[]).forEach(id=>caught.add(id));}}catch(e){}}
+load();
+function syncCoins(){document.getElementById('coinCount').textContent=coins;save();}
+syncCoins();
+let map,youMarker,spawnLayer;const ISTANBUL=[41.0082,28.9784];
+function initMap(center){
+  if(map)return;
+  map=L.map('leafmap',{zoomControl:false,attributionControl:false}).setView(center,16);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:19}).addTo(map);
+  youMarker=L.marker(center,{icon:L.divIcon({className:'cat-marker',html:'<div class="you-pin"></div>',iconSize:[18,18]})}).addTo(map);
+  spawnLayer=L.layerGroup().addTo(map);placeSpawns(center);
+  setTimeout(()=>map.invalidateSize(),200);
+}
+function placeSpawns(center){
+  if(!spawnLayer)return;spawnLayer.clearLayers();
+  CATS.forEach((cat,i)=>{
+    if(caught.has(cat.id))return;
+    const ang=(i/CATS.length)*Math.PI*2,r=0.0035+(i%3)*0.0012;
+    const ll=[center[0]+Math.sin(ang)*r,center[1]+Math.cos(ang)*r];
+    const m=L.marker(ll,{icon:L.divIcon({className:'cat-marker',html:`<div class="cat-pin">${catSVG(cat.art)}</div>`,iconSize:[46,46]})});
+    m.on('click',()=>startCatch(cat));spawnLayer.addLayer(m);
+  });
+}
+function setupGeo(){
+  const note=document.getElementById('geoNote');
+  if(navigator.geolocation){
+    navigator.geolocation.getCurrentPosition(
+      p=>{initMap([p.coords.latitude,p.coords.longitude]);note.textContent='📍 Gerçek konumun kullanılıyor';},
+      ()=>{initMap(ISTANBUL);note.textContent='Konum izni yok · örnek konum (İstanbul) gösteriliyor';},{timeout:6000});
+  }else{initMap(ISTANBUL);note.textContent='Konum desteklenmiyor · örnek konum gösteriliyor';}
+}
+setupGeo();
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active',s.id===id));
+  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.go===id));
+  if(id==='album')renderAlbum();
+  if(id==='battle')renderBattleHome();
+  if(id==='map'&&map)setTimeout(()=>map.invalidateSize(),120);
+  if(id!=='catch')stopCam();
+}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>show(b.dataset.go));
+let camStream=null,cocoModel=null,detLoop=null,currentWild=null;
+const camEl=document.getElementById('cam'),camSim=document.getElementById('camSim'),detbox=document.getElementById('detbox');
+(function loadModel(){
+  const tf=document.createElement('script');tf.src='https://cdnjs.cloudflare.com/ajax/libs/tensorflow/4.22.0/tf.min.js';
+  tf.onload=()=>{const co=document.createElement('script');co.src='https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3/dist/coco-ssd.min.js';
+    co.onload=()=>{if(window.cocoSsd)cocoSsd.load().then(m=>cocoModel=m).catch(()=>{});};document.body.appendChild(co);};
+  document.body.appendChild(tf);
+})();
+async function startCatch(cat){
+  currentWild=cat;
+  document.getElementById('wildName').textContent=cat.name;
+  document.getElementById('dist').textContent=(1+Math.floor(Math.random()*4))+' m';
+  document.getElementById('wildWrap').innerHTML=catSVG(cat.art);
+  resetCan();show('catch');
+  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.go==='catch'));
+  await startCam();
+}
+async function startCam(){
+  try{
+    camStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'},audio:false});
+    camEl.srcObject=camStream;camSim.style.display='none';
+    document.getElementById('camMode').textContent=cocoModel?'CANLI TANIMA':'AV MODU';runDetection();
+  }catch(e){camSim.style.display='block';document.getElementById('camMode').textContent='AV MODU';
+    document.getElementById('can').style.display='grid';document.getElementById('scanBtn').style.display='none';document.getElementById('canLabel').style.display='block';}
+}
+function stopCam(){
+  if(detLoop){cancelAnimationFrame(detLoop);detLoop=null;}
+  if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null;}
+  camEl.srcObject=null;detbox.style.display='none';
+}
+function runDetection(){
+  const canE=document.getElementById('can'),scan=document.getElementById('scanBtn'),label=document.getElementById('canLabel');
+  if(!cocoModel){canE.style.display='none';label.style.display='none';scan.style.display='block';return;}
+  canE.style.display='grid';scan.style.display='none';label.style.display='block';
+  const tick=async()=>{
+    if(!camStream)return;
+    try{
+      const preds=await cocoModel.detect(camEl);
+      const c=preds.find(p=>p.class==='cat'||p.class==='dog'||p.class==='teddy bear');
+      if(c){
+        const vw=camEl.videoWidth||640,vh=camEl.videoHeight||480,rw=camEl.clientWidth/vw,rh=camEl.clientHeight/vh;
+        let[x,y,w,h]=c.bbox;const fx=camEl.clientWidth-(x+w)*rw;
+        detbox.style.display='block';detbox.style.left=fx+'px';detbox.style.top=(y*rh)+'px';
+        detbox.style.width=(w*rw)+'px';detbox.style.height=(h*rh)+'px';
+        document.getElementById('detlabel').textContent='kedi %'+Math.round(c.score*100);
+      }else detbox.style.display='none';
+    }catch(e){}
+    detLoop=requestAnimationFrame(tick);
+  };
+  detLoop=requestAnimationFrame(tick);
+}
+document.getElementById('scanBtn').onclick=()=>{
+  const b=document.getElementById('scanBtn');b.textContent='Taranıyor…';b.disabled=true;
+  setTimeout(()=>{b.textContent='Kediyi tara';b.disabled=false;hitAndReveal();},900);
+};
+const can=document.getElementById('can');let dragging=false,sx=0,sy=0;
+function resetCan(){can.style.transition='none';can.style.transform='translateX(-50%)';can.style.opacity='1';can.style.bottom='158px';}
+function pDown(e){dragging=true;const p=e.touches?e.touches[0]:e;sx=p.clientX;sy=p.clientY;can.style.transition='none';can.style.cursor='grabbing';}
+function pMove(e){if(!dragging)return;e.preventDefault();const p=e.touches?e.touches[0]:e;can.style.transform=`translateX(-50%) translate(${p.clientX-sx}px,${p.clientY-sy}px)`;}
+function pUp(e){if(!dragging)return;dragging=false;can.style.cursor='grab';const p=e.changedTouches?e.changedTouches[0]:e;
+  if(p.clientY-sy<-80)throwCan();else{can.style.transition='transform .25s';resetCan();}}
+can.addEventListener('mousedown',pDown);can.addEventListener('touchstart',pDown,{passive:false});
+window.addEventListener('mousemove',pMove);window.addEventListener('touchmove',pMove,{passive:false});
+window.addEventListener('mouseup',pUp);window.addEventListener('touchend',pUp);
+function throwCan(){can.style.transition='transform .45s cubic-bezier(.3,.8,.4,1),opacity .45s';
+  can.style.transform='translateX(-50%) translateY(-310px) scale(.5)';can.style.opacity='0';hitAndReveal();}
+function hitAndReveal(){const w=document.getElementById('wildWrap');w.classList.add('hit');
+  setTimeout(()=>{w.classList.remove('hit');reveal(currentWild);},520);}
+function reveal(cat){
+  const gains={yaygin:15,nadir:30,ender:55,destansi:90,efsane:150},g=gains[cat.rar];
+  coins+=g;xp+=20;caught.add(cat.id);syncCoins();
+  document.getElementById('popFace').innerHTML=catSVG(cat.art);
+  document.getElementById('popName').textContent=cat.name;
+  document.getElementById('popHab').textContent=cat.hab;
+  const r=RAR[cat.rar],pr=document.getElementById('popRar');
+  pr.textContent=r.tr;pr.style.background=r.col;pr.style.color='#160f08';
+  document.getElementById('popReward').textContent=`+${g} jeton · +20 XP`;
+  document.getElementById('pop').classList.add('show');
+}
+document.getElementById('popOk').onclick=()=>{
+  document.getElementById('pop').classList.remove('show');stopCam();
+  if(map){const c=youMarker?youMarker.getLatLng():{lat:ISTANBUL[0],lng:ISTANBUL[1]};placeSpawns([c.lat,c.lng]);}
+  if(caught.size===CATS.length)toast('🏆 Tüm patiler yakalandı!');
+  show('album');
+};
+const grid=document.getElementById('grid');
+function renderAlbum(){
+  grid.innerHTML='';document.getElementById('albumCount').textContent=`${caught.size} / ${CATS.length}`;
+  CATS.forEach((cat,i)=>{
+    const got=caught.has(cat.id),r=RAR[cat.rar],serial='#'+String(i+1).padStart(4,'0');
+    const card=document.createElement('div');card.className='card'+(got?'':' locked');
+    card.innerHTML=`<div class="serial">${got?serial:'#????'}</div>
+      <div class="rar" style="background:${r.col};color:#160f08">${got?r.tr:'???'}</div>
+      <div class="face">${got?catSVG(cat.art):catSVG({body:'#3a2e1f',ear:'#2a2114',accent:'#3a2e1f'})}</div>
+      <div class="nm">${got?cat.name:'?????'}</div>
+      <div class="hb">${got?cat.hab:'Henüz bulunamadı'}</div>
+      <div class="stats">
+        <div class="pip"><i style="width:${got?cat.hp:0}%;background:var(--orange)"></i></div>
+        <div class="pip"><i style="width:${got?cat.atk:0}%;background:#ff6b6b"></i></div>
+        <div class="pip"><i style="width:${got?cat.def:0}%;background:#6ba8ff"></i></div>
+        <div class="pip"><i style="width:${got?cat.spd:0}%;background:#ffce6b"></i></div>
+      </div>`;
+    if(got)card.onclick=()=>openDetail(cat,serial);
+    grid.appendChild(card);
+  });
+}
+function openDetail(cat,serial){
+  document.getElementById('dFace').innerHTML=catSVG(cat.art);
+  document.getElementById('dName').textContent=cat.name;
+  document.getElementById('dHab').textContent=`${cat.hab} · ${serial} · ${cat.cls} / ${cat.el}`;
+  const set=(b,v,c)=>{const el=document.getElementById(b);el.style.width=v+'%';el.style.background=c;};
+  set('bHp',cat.hp,'var(--orange)');set('bAtk',cat.atk,'#ff6b6b');set('bDef',cat.def,'#6ba8ff');set('bSpd',cat.spd,'#ffce6b');
+  document.getElementById('vHp').textContent=cat.hp;document.getElementById('vAtk').textContent=cat.atk;
+  document.getElementById('vDef').textContent=cat.def;document.getElementById('vSpd').textContent=cat.spd;
+  document.getElementById('dStory').textContent='“'+cat.story+'”';
+  document.getElementById('detail').classList.add('show');
+}
+document.getElementById('dClose').onclick=()=>document.getElementById('detail').classList.remove('show');
+const battleBody=document.getElementById('battleBody');let myFighter=null,enemy=null,busy=false;
+function renderBattleHome(){
+  const mine=CATS.filter(c=>caught.has(c.id));
+  if(mine.length===0){battleBody.innerHTML=`<div class="empty">Önce bir pati yakala.<br>Yakaladığın kedilerle sokak kapışmasına çıkabilirsin.</div>`;return;}
+  if(!myFighter||!caught.has(myFighter.id))myFighter=mine[0];
+  enemy=enemy||randomEnemy();
+  battleBody.innerHTML=`
+    <div class="pick-row" id="pickRow"></div>
+    <div class="arena"><div class="fighter" id="meF"></div><div class="vs">VS</div><div class="fighter enemy" id="enF"></div></div>
+    <div class="log" id="log">Rakibin: <b style="color:var(--orange-lt)">${enemy.name}</b>. Saldır ya da yeni rakip ara.</div>
+    <div class="battle-actions"><button class="btn primary" id="atkBtn">Saldır</button><button class="btn ghost" id="newBtn">Yeni rakip</button></div>`;
+  const pr=document.getElementById('pickRow');
+  mine.forEach(c=>{const d=document.createElement('div');d.className='pick'+(c.id===myFighter.id?' sel':'');
+    d.innerHTML=catSVG(c.art)+`<div class="pn">${c.name}</div>`;d.onclick=()=>{myFighter=c;resetFight();};pr.appendChild(d);});
+  resetFight();
+  document.getElementById('atkBtn').onclick=attack;
+  document.getElementById('newBtn').onclick=()=>{enemy=randomEnemy();resetFight();log(`Yeni rakip: <b style="color:var(--orange-lt)">${enemy.name}</b>`);};
+}
+function randomEnemy(){return JSON.parse(JSON.stringify(CATS[Math.floor(Math.random()*CATS.length)]));}
+function resetFight(){
+  busy=false;myFighter._hp=myFighter.hp;enemy._hp=enemy.hp;drawFighters();
+  const mine=CATS.filter(c=>caught.has(c.id));
+  document.querySelectorAll('#pickRow .pick').forEach((d,i)=>d.classList.toggle('sel',mine[i].id===myFighter.id));
+  const ab=document.getElementById('atkBtn');if(ab)ab.disabled=false;
+}
+function drawFighters(){
+  const me=document.getElementById('meF'),en=document.getElementById('enF');
+  const pct=f=>Math.max(0,Math.round(f._hp/f.hp*100));
+  me.innerHTML=catSVG(myFighter.art)+`<div class="meta"><div class="nm">${myFighter.name}</div><div class="hpbar ${pct(myFighter)<35?'low':''}"><i style="width:${pct(myFighter)}%"></i></div></div>`;
+  en.innerHTML=catSVG(enemy.art)+`<div class="meta"><div class="nm">${enemy.name}</div><div class="hpbar ${pct(enemy)<35?'low':''}"><i style="width:${pct(enemy)}%"></i></div></div>`;
+}
+function dmg(a,d){const base=a.atk*(0.85+Math.random()*0.3),red=d.def/(d.def+60);return Math.max(4,Math.round(base*(1-red)));}
+function log(t){document.getElementById('log').innerHTML=t;}
+function attack(){
+  if(busy)return;busy=true;document.getElementById('atkBtn').disabled=true;
+  const first=myFighter.spd>=enemy.spd;
+  const seq=first?[[myFighter,enemy],[enemy,myFighter]]:[[enemy,myFighter],[myFighter,enemy]];
+  let i=0;
+  const step=()=>{
+    if(i>=seq.length){busy=false;document.getElementById('atkBtn').disabled=false;return;}
+    const[a,d]=seq[i];
+    if(a._hp<=0){i++;return step();}
+    const hit=dmg(a,d);d._hp-=hit;drawFighters();
+    log(`${a.name} saldırdı · <b style="color:#ff8a6b">-${hit} CAN</b>`);
+    if(d._hp<=0){drawFighters();
+      if(d===enemy){coins+=20;syncCoins();log(`🏆 <b>${myFighter.name}</b> kazandı! +20 jeton`);}
+      else log(`💢 <b>${enemy.name}</b> seni yendi. Tekrar dene.`);
+      busy=false;return;}
+    i++;setTimeout(step,650);
+  };
+  step();
+}
+document.getElementById('adBanner').onclick=()=>{
+  const m=document.getElementById('adwatch'),t=document.getElementById('adTimer'),btn=document.getElementById('adClaim');
+  m.classList.add('show');let s=5;t.textContent=s;btn.disabled=true;btn.textContent='Bekle…';
+  document.getElementById('adPh').innerHTML='Reklam oynatılıyor…<br><small>(Yayında AdMob/AdSense ödüllü reklam buraya gelir)</small>';
+  const iv=setInterval(()=>{s--;t.textContent=s;if(s<=0){clearInterval(iv);btn.disabled=false;btn.textContent='+30 jeton al';document.getElementById('adPh').innerHTML='Reklam tamamlandı ✓';}},1000);
+  btn.onclick=()=>{coins+=30;syncCoins();m.classList.remove('show');toast('+30 jeton · teşekkürler!');};
+};
+let tT;function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('show'),2200);}
+renderAlbum();
+</script>
+</body>
+</html>
