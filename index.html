@@ -162,7 +162,7 @@
       </div>
     </section>
     <section class="screen" id="catch">
-      <video id="cam" autoplay playsinline muted></video>
+      <video id="cam" autoplay playsinline webkit-playsinline muted></video>
       <div class="cam-sim" id="camSim"></div>
       <div class="scrim"></div>
       <div class="reticle"><span class="live"><span class="dot"></span><span id="camMode">AV MODU</span></span><span id="dist">3 m</span></div>
@@ -248,7 +248,7 @@ function initMap(center){
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:19}).addTo(map);
   youMarker=L.marker(center,{icon:L.divIcon({className:'cat-marker',html:'<div class="you-pin"></div>',iconSize:[18,18]})}).addTo(map);
   spawnLayer=L.layerGroup().addTo(map);placeSpawns(center);
-  setTimeout(()=>map.invalidateSize(),200);
+  setTimeout(()=>map.invalidateSize(),200);setTimeout(()=>map.invalidateSize(),600);
 }
 function placeSpawns(center){
   if(!spawnLayer)return;spawnLayer.clearLayers();
@@ -269,6 +269,11 @@ function setupGeo(){
   }else{initMap(ISTANBUL);note.textContent='Konum desteklenmiyor · örnek konum gösteriliyor';}
 }
 setupGeo();
+function fixMap(){if(map)map.invalidateSize();}
+window.addEventListener('load',()=>setTimeout(fixMap,300));
+window.addEventListener('resize',fixMap);
+window.addEventListener('orientationchange',()=>setTimeout(fixMap,350));
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)setTimeout(fixMap,200);});
 function show(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active',s.id===id));
   document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.go===id));
@@ -317,9 +322,11 @@ async function startCam(){
     }
   }
   camStream=s;camEl.srcObject=s;camSim.style.display='none';camErr.style.display='none';
-  try{await camEl.play();}catch(e){}
-  document.getElementById('camMode').textContent=cocoModel?'CANLI TANIMA':'AV MODU';
-  runDetection();
+  camEl.setAttribute('playsinline','');camEl.muted=true;
+  const tryPlay=()=>{const p=camEl.play();if(p&&p.catch)p.catch(()=>{});};
+  camEl.onloadedmetadata=tryPlay;tryPlay();setTimeout(tryPlay,300);
+  document.getElementById('camMode').textContent=cocoModel?'KEDİ TANIMA':'AV MODU';
+  showCatchControls();
 }
 document.getElementById('camRetry').onclick=()=>startCam();
 function stopCam(){
@@ -327,18 +334,14 @@ function stopCam(){
   if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null;}
   camEl.srcObject=null;
 }
-function runDetection(){
-  if(!cocoModel){canEl.style.display='none';canLabel.style.display='none';scanBtn.style.display='block';return;}
-  canEl.style.display='grid';scanBtn.style.display='none';canLabel.style.display='block';
-  const tick=async()=>{
-    if(!camStream)return;
-    try{await cocoModel.detect(camEl);}catch(e){}
-    detLoop=requestAnimationFrame(tick);
-  };
-  detLoop=requestAnimationFrame(tick);
+function showCatchControls(){canEl.style.display='grid';canLabel.style.display='block';scanBtn.style.display='none';}
+async function detectCat(){
+  if(!cocoModel||!camStream)return null;
+  try{const preds=await cocoModel.detect(camEl,3);
+    const c=preds.find(p=>['cat','dog','teddy bear','bird'].includes(p.class));
+    return c?Math.round(c.score*100):null;
+  }catch(e){return null;}
 }
-scanBtn.onclick=()=>{scanBtn.textContent='Taranıyor…';scanBtn.disabled=true;
-  setTimeout(()=>{scanBtn.textContent='Kediyi tara';scanBtn.disabled=false;hitAndReveal();},900);};
 const can=document.getElementById('can');let dragging=false,sx=0,sy=0;
 function resetCan(){can.style.transition='none';can.style.transform='translateX(-50%)';can.style.opacity='1';can.style.bottom='158px';}
 function pDown(e){dragging=true;const p=e.touches?e.touches[0]:e;sx=p.clientX;sy=p.clientY;can.style.transition='none';can.style.cursor='grabbing';}
@@ -351,13 +354,13 @@ window.addEventListener('mouseup',pUp);window.addEventListener('touchend',pUp);
 function throwCan(){can.style.transition='transform .45s cubic-bezier(.3,.8,.4,1),opacity .45s';
   can.style.transform='translateX(-50%) translateY(-300px) scale(.5)';can.style.opacity='0';hitAndReveal();}
 function hitAndReveal(){const w=document.getElementById('wildWrap');w.classList.add('hit');
-  setTimeout(()=>{w.classList.remove('hit');reveal(currentWild);},520);}
-function reveal(cat){
+  detectCat().then(conf=>{setTimeout(()=>{w.classList.remove('hit');reveal(currentWild,conf);},500);});}
+function reveal(cat,conf){
   const gains={yaygin:15,nadir:30,ender:55,destansi:90,efsane:150},g=gains[cat.rar];
   coins+=g;xp+=20;caught.add(cat.id);syncCoins();
   document.getElementById('popFace').innerHTML=`<div class="pf">${img(cat)}</div>`;
   document.getElementById('popName').textContent=cat.name;
-  document.getElementById('popHab').textContent=cat.hab;
+  document.getElementById('popHab').textContent=(conf?('Gerçek kedi algılandı %'+conf+' · '):'')+cat.hab;
   const r=RAR[cat.rar],pr=document.getElementById('popRar');
   pr.textContent=r.tr;pr.style.background=r.col;pr.style.color='#160f08';
   document.getElementById('popReward').textContent=`+${g} jeton · +20 XP`;
