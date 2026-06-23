@@ -31,6 +31,8 @@
   .cat-pin img{width:100%;height:100%;object-fit:cover}
   @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
   .you-pin{width:18px;height:18px;background:var(--orange);border-radius:50%;box-shadow:0 0 0 6px rgba(255,122,24,.22),0 0 0 13px rgba(255,122,24,.08)}
+  .caught-pin{width:40px;height:40px;border-radius:50%;overflow:hidden;border:2px solid var(--uncommon);box-shadow:0 3px 10px rgba(0,0,0,.5),0 0 0 3px rgba(116,196,122,.22);background:#241a0c;cursor:pointer}
+  .caught-pin img{width:100%;height:100%;object-fit:cover}
   .map-hint{margin:10px 16px 0;font-size:12.5px;color:var(--muted);text-align:center;line-height:1.5}.map-hint b{color:var(--cream)}
   .geo-note{margin:6px 16px 0;font-size:10.5px;color:var(--muted);text-align:center;opacity:.7}
   .ad{margin:10px 14px 0;border:1px dashed rgba(255,154,68,.3);border-radius:14px;padding:10px 12px;display:flex;align-items:center;gap:10px;background:rgba(255,122,24,.05);cursor:pointer}
@@ -226,14 +228,21 @@ function syncCoins(){document.getElementById('coinCount').textContent=coins;save
 syncCoins();
 function caughtIds(){return new Set(captures.filter(c=>c.catId).map(c=>c.catId));}
 /* HARİTA */
-let map,youMarker,spawnLayer;const ISTANBUL=[41.0082,28.9784];
+let map,youMarker,spawnLayer,capturesLayer;const ISTANBUL=[41.0082,28.9784];
 function initMap(center){
   if(map)return;
   map=L.map('leafmap',{zoomControl:false,attributionControl:false}).setView(center,16);
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:19}).addTo(map);
   youMarker=L.marker(center,{icon:L.divIcon({className:'cat-marker',html:'<div class="you-pin"></div>',iconSize:[18,18]})}).addTo(map);
-  spawnLayer=L.layerGroup().addTo(map);placeSpawns(center);
+  spawnLayer=L.layerGroup().addTo(map);capturesLayer=L.layerGroup().addTo(map);
+  placeSpawns(center);renderCaughtMarkers();
   setTimeout(()=>map.invalidateSize(),200);setTimeout(()=>map.invalidateSize(),600);
+}
+function renderCaughtMarkers(){
+  if(!capturesLayer)return;capturesLayer.clearLayers();
+  captures.forEach(cap=>{if(!cap.loc)return;
+    const m=L.marker([cap.loc.lat,cap.loc.lng],{icon:L.divIcon({className:'cat-marker',html:`<div class="caught-pin"><img src="${cap.img}"></div>`,iconSize:[40,40]})});
+    m.on('click',()=>openCard(cap,false));capturesLayer.addLayer(m);});
 }
 function placeSpawns(center){
   if(!spawnLayer)return;spawnLayer.clearLayers();const got=caughtIds();
@@ -270,22 +279,19 @@ function show(id){
 }
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>show(b.dataset.go));
 /* MODELLER */
-let mobilenetModel=null,deepModel=null,deepTried=false;
+let mobilenetModel=null;
+let imglyMod=null,imglyTried=false;
 (function loadModels(){
   const tf=document.createElement('script');tf.src='https://cdnjs.cloudflare.com/ajax/libs/tensorflow/4.22.0/tf.min.js';
-  tf.onload=()=>{
-    const mn=document.createElement('script');mn.src='https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.0/dist/mobilenet.min.js';
-    mn.onload=()=>{if(window.mobilenet)mobilenet.load().then(m=>mobilenetModel=m).catch(()=>{});};document.body.appendChild(mn);
-    const dl=document.createElement('script');dl.src='https://cdn.jsdelivr.net/npm/@tensorflow-models/deeplab@0.2.1/dist/index.min.js';
-    document.body.appendChild(dl);
-  };
+  tf.onload=()=>{const mn=document.createElement('script');mn.src='https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.0/dist/mobilenet.min.js';
+    mn.onload=()=>{if(window.mobilenet)mobilenet.load().then(m=>mobilenetModel=m).catch(()=>{});};document.body.appendChild(mn);};
   document.body.appendChild(tf);
 })();
-async function ensureDeep(){
-  if(deepModel)return deepModel;
-  if(!window.deeplab)return null;
-  try{deepModel=await deeplab.load({base:'pascal',quantizationBytes:2});}catch(e){deepModel=null;}
-  return deepModel;
+async function loadImgly(){
+  if(imglyMod||imglyTried)return imglyMod;
+  imglyTried=true;
+  try{imglyMod=await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.8/+esm');}catch(e){imglyMod=null;}
+  return imglyMod;
 }
 /* RENK + TÜR */
 function dominantColor(cv){
@@ -314,31 +320,40 @@ async function analyze(cv){
   let label=((color?color+' ':'')+breed);label=label.charAt(0).toUpperCase()+label.slice(1);
   return {label,conf,isCat};
 }
-/* ARKA PLAN KESME (deeplab) */
+/* ARKA PLAN KESME (imgly background-removal) */
 async function cutout(srcCanvas){
-  const model=await ensureDeep();
-  if(!model)return null;
+  const mod=await loadImgly();
+  if(!mod||!mod.removeBackground)return null;
   try{
-    const out=await model.segment(srcCanvas);
-    const {legend,width,height,segmentationMap}=out;
-    let target=legend['cat'];
-    if(!target){const keys=Object.keys(legend||{}).filter(k=>k!=='background');if(keys.length)target=legend[keys[0]];}
-    if(!target)return null;
-    const seg=document.createElement('canvas');seg.width=width;seg.height=height;
-    seg.getContext('2d').putImageData(new ImageData(new Uint8ClampedArray(segmentationMap),width,height),0,0);
-    const segData=seg.getContext('2d').getImageData(0,0,width,height).data;
-    const ow=Math.min(480,srcCanvas.width),scale=ow/srcCanvas.width,oh=Math.round(srcCanvas.height*scale);
-    const o=document.createElement('canvas');o.width=ow;o.height=oh;const octx=o.getContext('2d');
-    octx.drawImage(srcCanvas,0,0,ow,oh);
-    const od=octx.getImageData(0,0,ow,oh),px=od.data;let hit=0;
-    for(let y=0;y<oh;y++){const sy=Math.min(height-1,Math.floor(y/oh*height));
-      for(let x=0;x<ow;x++){const sx=Math.min(width-1,Math.floor(x/ow*width));const si=(sy*width+sx)*4;
-        if(!(segData[si]===target[0]&&segData[si+1]===target[1]&&segData[si+2]===target[2])){px[(y*ow+x)*4+3]=0;}else hit++;}}
-    if(hit<ow*oh*0.02)return null;
-    octx.putImageData(od,0,0);
+    const srcBlob=await new Promise(r=>srcCanvas.toBlob(r,'image/jpeg',0.85));
+    if(!srcBlob)return null;
+    const outBlob=await mod.removeBackground(srcBlob,{model:'isnet_quint8',output:{format:'image/png'}});
+    if(!outBlob)return null;
+    const url=URL.createObjectURL(outBlob);
+    const im=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=url;});
+    const ow=Math.min(480,im.width),scale=ow/im.width,oh=Math.round(im.height*scale);
+    const o=document.createElement('canvas');o.width=ow;o.height=oh;o.getContext('2d').drawImage(im,0,0,ow,oh);
+    try{URL.revokeObjectURL(url);}catch(e){}
     return o.toDataURL('image/png');
   }catch(e){return null;}
 }
+/* KONUM */
+function getPos(){return new Promise(res=>{
+  if(!navigator.geolocation){res(youMarker?{lat:youMarker.getLatLng().lat,lng:youMarker.getLatLng().lng}:null);return;}
+  navigator.geolocation.getCurrentPosition(
+    p=>res({lat:p.coords.latitude,lng:p.coords.longitude}),
+    ()=>res(youMarker?{lat:youMarker.getLatLng().lat,lng:youMarker.getLatLng().lng}:null),
+    {enableHighAccuracy:true,timeout:8000,maximumAge:30000});
+});}
+async function placeName(loc){
+  if(!loc)return '';
+  try{const r=await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${loc.lat}&longitude=${loc.lng}&localityLanguage=tr`);
+    const j=await r.json();
+    const parts=[j.locality,j.city||j.principalSubdivision].filter(Boolean).filter((v,i,a)=>a.indexOf(v)===i);
+    return parts.slice(0,2).join(', ');
+  }catch(e){return '';}
+}
+const PIN='<svg class="ic" viewBox="0 0 24 24" style="width:12px;height:12px;vertical-align:-2px"><path d="M12 21s7-6.5 7-11a7 7 0 1 0-14 0c0 4.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>';
 /* KAMERA */
 let currentWild=null;
 const snap=document.getElementById('snap'),camInput=document.getElementById('camInput');
@@ -348,7 +363,7 @@ function enterCamera(target){
   document.getElementById('skipCamBtn').style.display=target?'inline-block':'none';
 }
 document.getElementById('openCamBtn').onclick=()=>camInput.click();
-document.getElementById('skipCamBtn').onclick=()=>{if(currentWild)finishCapture(currentWild,null,{label:'',conf:null});};
+document.getElementById('skipCamBtn').onclick=async()=>{if(!currentWild)return;showProc('Konum alınıyor…');const loc=await getPos();const place=await placeName(loc);hideProc();finishCapture(currentWild,null,{label:'',conf:null},loc,place);};
 camInput.onchange=()=>{
   const file=camInput.files&&camInput.files[0];camInput.value='';
   if(!file)return;
@@ -358,11 +373,13 @@ camInput.onchange=()=>{
     snap.width=cw;snap.height=ch;snap.getContext('2d').drawImage(im,0,0,cw,ch);
     showProc('Tür analiz ediliyor…');
     const a=await analyze(snap);
-    showProc('Arka plan kesiliyor…');
-    let cut=null;try{cut=await cutout(snap);}catch(e){}
+    showProc('Arka plan kesiliyor… (ilk seferde model iniyor, biraz sürebilir)');
+    let cut=null;try{cut=await Promise.race([cutout(snap),new Promise(r=>setTimeout(()=>r(null),35000))]);}catch(e){}
     let fallback='';try{fallback=snap.toDataURL('image/jpeg',0.72);}catch(e){fallback=url;}
+    showProc('Konum alınıyor…');
+    const loc=await getPos();const place=await placeName(loc);
     hideProc();
-    finishCapture(currentWild,cut||fallback,a);
+    finishCapture(currentWild,cut||fallback,a,loc,place);
   };
   im.onerror=()=>{hideProc();toast('Fotoğraf okunamadı, tekrar dene.');};
   im.src=url;
@@ -370,21 +387,21 @@ camInput.onchange=()=>{
 function showProc(m){document.getElementById('procMsg').textContent=m;document.getElementById('proc').classList.add('show');}
 function hideProc(){document.getElementById('proc').classList.remove('show');}
 /* YAKALAMA -> KART */
-function finishCapture(target,imgData,a){
+function finishCapture(target,imgData,a,loc,place){
   seq++;
   let cap;
   if(target){
     cap={cid:seq,catId:target.id,name:target.name,type:a.label||target.name,conf:a.conf,rar:target.rar,cls:target.cls,el:target.el,
-      hp:target.hp,atk:target.atk,def:target.def,spd:target.spd,story:target.story,hab:target.hab,img:imgData||target.photo,ts:Date.now()};
+      hp:target.hp,atk:target.atk,def:target.def,spd:target.spd,story:target.story,hab:target.hab,img:imgData||target.photo,ts:Date.now(),loc:loc||null,place:place||''};
     coins+=({yaygin:15,nadir:30,ender:55,destansi:90,efsane:150})[target.rar];xp+=20;
   }else{
     const rar=rollRarity(),st=genStats(rar);
     cap={cid:seq,catId:null,name:a.label||'Sokak kedisi',type:a.label||'Sokak kedisi',conf:a.conf,rar,cls:pick(CLASSES),el:pick(ELEMENTS),
-      hp:st.hp,atk:st.atk,def:st.def,spd:st.spd,story:pick(STORIES),hab:pick(HABITATS),img:imgData,ts:Date.now()};
+      hp:st.hp,atk:st.atk,def:st.def,spd:st.spd,story:pick(STORIES),hab:pick(HABITATS),img:imgData,ts:Date.now(),loc:loc||null,place:place||''};
     coins+=15;xp+=12;
   }
   captures.push(cap);saveCaps();syncCoins();
-  if(map){const c=youMarker?youMarker.getLatLng():{lat:ISTANBUL[0],lng:ISTANBUL[1]};placeSpawns([c.lat,c.lng]);}
+  if(map){const c=youMarker?youMarker.getLatLng():{lat:ISTANBUL[0],lng:ISTANBUL[1]};placeSpawns([c.lat,c.lng]);renderCaughtMarkers();}
   openCard(cap,true);
 }
 /* POKEMON KART */
@@ -400,10 +417,11 @@ function cardFace(cap,back){
   const bar=(v,c)=>`<div class="cstat"><span>${''}</span></div>`;
   const row=(lbl,v,c)=>`<div class="cstat"><span>${lbl}</span><div class="b"><i style="width:${v}%;background:${c}"></i></div><b>${v}</b></div>`;
   const d=new Date(cap.ts);
+  const locLine=(cap.place||cap.loc)?`${PIN} ${cap.place||(cap.loc.lat.toFixed(4)+', '+cap.loc.lng.toFixed(4))}${cap.loc?` · <a href="https://www.google.com/maps?q=${cap.loc.lat},${cap.loc.lng}" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="color:var(--orange-lt)">haritada gör</a>`:''}<br>`:'';
   return `<div class="cback-name">${cap.name}</div>
     ${row('CAN',cap.hp,'var(--orange)')}${row('SAL',cap.atk,'#ff6b6b')}${row('SAV',cap.def,'#6ba8ff')}${row('HIZ',cap.spd,'#ffce6b')}
     <div class="cstory">“${cap.story}”</div>
-    <div class="cfoot">${cap.hab} · ${cap.type}<br>Yakalandı: ${d.toLocaleDateString('tr-TR')} ${d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})}</div>`;
+    <div class="cfoot">${locLine}${cap.type} · Yakalandı: ${d.toLocaleDateString('tr-TR')} ${d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})}</div>`;
 }
 function openCard(cap,fresh){
   const r=RAR[cap.rar];
