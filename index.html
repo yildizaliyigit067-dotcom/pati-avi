@@ -58,7 +58,7 @@
   .cap-card{border-radius:20px;overflow:hidden;border:1px solid var(--line);cursor:pointer;background:linear-gradient(160deg,#2a1d0d,#160f08);padding:9px;position:relative;transition:transform .15s}
   .cap-card:active{transform:scale(.97)}
   .cap-card .cp{aspect-ratio:.82;border-radius:14px;overflow:hidden;display:grid;place-items:center;position:relative}
-  .cap-card .cp img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 6px 10px rgba(0,0,0,.5))}
+  .cap-card .cp img{width:100%;height:100%;object-fit:cover;filter:drop-shadow(0 6px 10px rgba(0,0,0,.5))}
   .cap-card .cn{font-size:13.5px;font-weight:800;margin-top:8px;line-height:1.15}
   .cap-card .csub{font-size:10.5px;color:var(--orange-lt);font-weight:700;margin-top:1px}
   .cap-card .cr{position:absolute;top:8px;right:8px;z-index:2;font-size:8px;font-weight:800;letter-spacing:.5px;padding:3px 7px;border-radius:20px;text-transform:uppercase;color:#160f08}
@@ -108,7 +108,7 @@
   .cserial{font-size:11px;color:rgba(255,255,255,.7);font-weight:800}
   .crar{font-size:10px;font-weight:800;letter-spacing:.6px;padding:3px 10px;border-radius:20px;text-transform:uppercase;color:#160f08}
   .cphoto{flex:1;border-radius:15px;overflow:hidden;display:grid;place-items:center;position:relative;background:rgba(0,0,0,.18)}
-  .cphoto img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 10px 16px rgba(0,0,0,.55))}
+  .cphoto img{width:100%;height:100%;object-fit:cover;filter:drop-shadow(0 10px 16px rgba(0,0,0,.55))}
   .cname{font-size:19px;font-weight:800;margin-top:11px;text-align:center;color:#fff;line-height:1.1}
   .cmeta{font-size:12px;font-weight:700;text-align:center;margin-top:3px;color:rgba(255,255,255,.85)}
   .cback-name{font-size:17px;font-weight:800;color:#fff;margin-bottom:12px}
@@ -153,7 +153,7 @@
       <div class="cam-start" id="camPanel">
         <div class="camico"><svg class="ic" viewBox="0 0 24 24"><path d="M3 8a2 2 0 0 1 2-2h2l1.5-2h7L19 6a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="12.5" r="3.4"/></svg></div>
         <h3 id="camStartTitle">Kediyi yakala</h3>
-        <p id="camStartDesc">Kameraya bas, kediyi karşına al ve deklanşörle fotoğrafını çek. Arka planı otomatik kesilir, tür analizi yapılır ve kartın albümüne eklenir.</p>
+        <p id="camStartDesc">Kameraya bas, kediyi karşına al ve deklanşörle fotoğrafını çek. Türü analiz edilir ve kartın albümüne eklenir.</p>
         <button class="ob" id="openCamBtn"><svg class="ic" viewBox="0 0 24 24" style="width:18px;height:18px;vertical-align:-3px"><path d="M3 8a2 2 0 0 1 2-2h2l1.5-2h7L19 6a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="12.5" r="3.2"/></svg> Kamerayı Aç</button>
         <button class="gb" id="skipCamBtn" style="display:none">Fotoğrafsız yakala</button>
         <p style="font-size:11px;color:var(--muted);opacity:.85;max-width:250px;line-height:1.5">İlk açılışta telefon kamera iznini ister. Çıkan kutuda “İzin Ver” de.</p>
@@ -175,7 +175,7 @@
     <button data-go="album"><span class="ic"><svg class="ic" viewBox="0 0 24 24"><path d="M5 4a2 2 0 0 1 2-2h11a1 1 0 0 1 1 1v17a1 1 0 0 1-1 1H7a2 2 0 0 1-2-2z"/><path d="M5 18a2 2 0 0 1 2-2h12"/></svg></span>Albüm</button>
     <button data-go="battle"><span class="ic"><svg class="ic" viewBox="0 0 24 24"><path d="M14.5 3.5 21 10l-3 3-6.5-6.5zM3 21l6-6M6.5 17.5 3 21M9.5 14.5 13 18"/></svg></span>Dövüş</button>
   </nav>
-  <div class="proc" id="proc"><div class="spin"></div><p id="procMsg">Arka plan kesiliyor…</p></div>
+  <div class="proc" id="proc"><div class="spin"></div><p id="procMsg">İşleniyor…</p></div>
   <div class="pop" id="cardPop"><div class="cardWrap">
     <div class="tcard" id="tcard"><div class="inner">
       <div class="cface front" id="cardFront"></div>
@@ -280,19 +280,12 @@ function show(id){
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>show(b.dataset.go));
 /* MODELLER */
 let mobilenetModel=null;
-let imglyMod=null,imglyTried=false;
 (function loadModels(){
   const tf=document.createElement('script');tf.src='https://cdnjs.cloudflare.com/ajax/libs/tensorflow/4.22.0/tf.min.js';
   tf.onload=()=>{const mn=document.createElement('script');mn.src='https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.0/dist/mobilenet.min.js';
     mn.onload=()=>{if(window.mobilenet)mobilenet.load().then(m=>mobilenetModel=m).catch(()=>{});};document.body.appendChild(mn);};
   document.body.appendChild(tf);
 })();
-async function loadImgly(){
-  if(imglyMod||imglyTried)return imglyMod;
-  imglyTried=true;
-  try{imglyMod=await import('https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.5.8/+esm');}catch(e){imglyMod=null;}
-  return imglyMod;
-}
 /* RENK + TÜR */
 function dominantColor(cv){
   try{const ctx=cv.getContext('2d'),w=cv.width,h=cv.height;
@@ -319,23 +312,6 @@ async function analyze(cv){
   }catch(e){}}
   let label=((color?color+' ':'')+breed);label=label.charAt(0).toUpperCase()+label.slice(1);
   return {label,conf,isCat};
-}
-/* ARKA PLAN KESME (imgly background-removal) */
-async function cutout(srcCanvas){
-  const mod=await loadImgly();
-  if(!mod||!mod.removeBackground)return null;
-  try{
-    const srcBlob=await new Promise(r=>srcCanvas.toBlob(r,'image/jpeg',0.85));
-    if(!srcBlob)return null;
-    const outBlob=await mod.removeBackground(srcBlob,{model:'isnet_quint8',output:{format:'image/png'}});
-    if(!outBlob)return null;
-    const url=URL.createObjectURL(outBlob);
-    const im=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=url;});
-    const ow=Math.min(480,im.width),scale=ow/im.width,oh=Math.round(im.height*scale);
-    const o=document.createElement('canvas');o.width=ow;o.height=oh;o.getContext('2d').drawImage(im,0,0,ow,oh);
-    try{URL.revokeObjectURL(url);}catch(e){}
-    return o.toDataURL('image/png');
-  }catch(e){return null;}
 }
 /* KONUM */
 function getPos(){return new Promise(res=>{
@@ -373,13 +349,11 @@ camInput.onchange=()=>{
     snap.width=cw;snap.height=ch;snap.getContext('2d').drawImage(im,0,0,cw,ch);
     showProc('Tür analiz ediliyor…');
     const a=await analyze(snap);
-    showProc('Arka plan kesiliyor… (ilk seferde model iniyor, biraz sürebilir)');
-    let cut=null;try{cut=await Promise.race([cutout(snap),new Promise(r=>setTimeout(()=>r(null),35000))]);}catch(e){}
-    let fallback='';try{fallback=snap.toDataURL('image/jpeg',0.72);}catch(e){fallback=url;}
+    let photo='';try{photo=snap.toDataURL('image/jpeg',0.78);}catch(e){photo=url;}
     showProc('Konum alınıyor…');
     const loc=await getPos();const place=await placeName(loc);
     hideProc();
-    finishCapture(currentWild,cut||fallback,a,loc,place);
+    finishCapture(currentWild,photo,a,loc,place);
   };
   im.onerror=()=>{hideProc();toast('Fotoğraf okunamadı, tekrar dene.');};
   im.src=url;
