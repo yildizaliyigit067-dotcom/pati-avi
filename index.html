@@ -159,24 +159,16 @@
       </div>
     </section>
     <section class="screen" id="catch">
-      <video id="cam" autoplay playsinline webkit-playsinline muted></video>
       <canvas id="snap"></canvas>
-      <div class="cam-top"><span class="live"><span class="dot"></span><span id="camMode">Kamera</span></span><span id="dist"></span></div>
-      <div class="corner tl"></div><div class="corner tr"></div><div class="corner bl"></div><div class="corner br"></div>
-      <div class="cam-tag" id="camTag"><svg class="ic" viewBox="0 0 24 24" style="width:14px;height:14px"><path d="M21 12.8a9 9 0 1 1-9.8-9.8 7 7 0 0 0 9.8 9.8z"/></svg> <em id="camTagName">Tekir</em> belirdi</div>
-      <div class="cam-start" id="camStart">
+      <div class="cam-start" id="camPanel">
         <div class="camico"><svg class="ic" viewBox="0 0 24 24"><path d="M3 8a2 2 0 0 1 2-2h2l1.5-2h7L19 6a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="12.5" r="3.4"/></svg></div>
         <h3 id="camStartTitle">Kediyi yakala</h3>
-        <p>Kameraya bas, kediyi karşına al ve deklanşöre dokunarak fotoğrafını çek. Çektiğin foto albümüne kaydedilir.</p>
-        <button class="ob" id="openCamBtn">Kamerayı Aç</button>
+        <p id="camStartDesc">Kameraya bas, kediyi karşına al ve telefonun deklanşörüyle fotoğrafını çek. Çektiğin foto albümüne kaydedilir.</p>
+        <button class="ob" id="openCamBtn"><svg class="ic" viewBox="0 0 24 24" style="width:18px;height:18px;vertical-align:-3px"><path d="M3 8a2 2 0 0 1 2-2h2l1.5-2h7L19 6a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="12.5" r="3.2"/></svg> Kamerayı Aç</button>
         <button class="gb" id="skipCamBtn" style="display:none">Fotoğrafsız yakala</button>
+        <p style="font-size:11px;color:var(--muted);opacity:.85;max-width:250px;line-height:1.5">İlk açılışta telefon kamera iznini ister. Çıkan kutuda “İzin Ver” de; sonra deklanşörle çek.</p>
       </div>
-      <div class="cam-err" id="camErr">
-        <p id="camErrMsg"></p>
-        <button id="camRetry">Tekrar dene</button>
-        <button class="gb" id="skipCamBtn2" style="display:none">Fotoğrafsız yakala</button>
-      </div>
-      <button class="shutter" id="shutter"></button>
+      <input id="camInput" type="file" accept="image/*" capture="environment" style="position:absolute;left:-9999px;width:1px;height:1px">
     </section>
     <section class="screen" id="album">
       <div class="album-head"><h2>Pati Albümü</h2><span class="count" id="albumCount">0 / 5</span></div>
@@ -295,66 +287,39 @@ function show(id){
   if(id==='catch')enterCamera(null);else stopCam();
 }
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>show(b.dataset.go));
-/* KAMERA + ML */
-let camStream=null,cocoModel=null,currentWild=null;
-const camEl=document.getElementById('cam'),snap=document.getElementById('snap');
-const camStart=document.getElementById('camStart'),camErr=document.getElementById('camErr'),shutter=document.getElementById('shutter');
-const camTag=document.getElementById('camTag'),camMode=document.getElementById('camMode');
+/* KAMERA (telefonun kendi kamerası) + ML */
+let cocoModel=null,currentWild=null;
+const snap=document.getElementById('snap'),camInput=document.getElementById('camInput');
 (function loadModel(){
   const tf=document.createElement('script');tf.src='https://cdnjs.cloudflare.com/ajax/libs/tensorflow/4.22.0/tf.min.js';
   tf.onload=()=>{const co=document.createElement('script');co.src='https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3/dist/coco-ssd.min.js';
     co.onload=()=>{if(window.cocoSsd)cocoSsd.load().then(m=>cocoModel=m).catch(()=>{});};document.body.appendChild(co);};
   document.body.appendChild(tf);
 })();
+function stopCam(){}
 function enterCamera(target){
-  stopCam();currentWild=target;
-  camErr.style.display='none';shutter.style.display='none';
-  camStart.style.display='flex';
+  currentWild=target;
   document.getElementById('camStartTitle').textContent=target?(target.name+' karşında'):'Sokak kedisi yakala';
-  document.getElementById('dist').textContent=target?(1+Math.floor(Math.random()*4))+' m':'';
-  if(target){camTag.style.display='block';document.getElementById('camTagName').textContent=target.name;}else camTag.style.display='none';
-  document.getElementById('skipCamBtn').style.display=target?'block':'none';
-  document.getElementById('skipCamBtn2').style.display=target?'block':'none';
+  document.getElementById('camStartDesc').textContent=target?(target.name+' karşında. Kameraya bas, fotoğrafını çek; bu kedi senin çektiğin fotoğrafla albüme girer.'):'Kameraya bas, kediyi karşına al ve telefonun deklanşörüyle fotoğrafını çek. Çektiğin foto albümüne kaydedilir.';
+  document.getElementById('skipCamBtn').style.display=target?'inline-block':'none';
 }
-async function openCamera(){
-  camStart.style.display='none';camErr.style.display='none';
-  if(!window.isSecureContext){return camFail('Kamera için güvenli bağlantı (https) gerekir.');}
-  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){return camFail('Bu tarayıcı kamerayı desteklemiyor.');}
-  let s=null;
-  try{s=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false});}
-  catch(e1){
-    try{s=await navigator.mediaDevices.getUserMedia({video:true,audio:false});}
-    catch(e2){
-      if(e2.name==='NotAllowedError'||e2.name==='SecurityError')return camFail('Kamera izni verilmedi. Ayarlar > Safari > Kamera bölümünden izin verip tekrar dene.');
-      if(e2.name==='NotFoundError')return camFail('Kamera bulunamadı.');
-      return camFail('Kamera açılamadı ('+e2.name+').');
-    }
-  }
-  camStream=s;camEl.srcObject=s;camEl.setAttribute('playsinline','');camEl.muted=true;
-  const play=()=>{const p=camEl.play();if(p&&p.catch)p.catch(()=>{});};
-  camEl.onloadedmetadata=play;play();setTimeout(play,300);
-  shutter.style.display='block';
-  camMode.textContent=cocoModel?'Kedi tanıma hazır':'Kamera açık';
-}
-function camFail(msg){camErr.style.display='flex';document.getElementById('camErrMsg').textContent=msg;shutter.style.display='none';camStart.style.display='none';}
-function stopCam(){if(camStream){camStream.getTracks().forEach(t=>t.stop());camStream=null;}camEl.srcObject=null;}
-document.getElementById('openCamBtn').onclick=openCamera;
-document.getElementById('camRetry').onclick=openCamera;
+document.getElementById('openCamBtn').onclick=()=>camInput.click();
 document.getElementById('skipCamBtn').onclick=()=>{if(currentWild)catchNamed(currentWild,null,null);};
-document.getElementById('skipCamBtn2').onclick=()=>{if(currentWild)catchNamed(currentWild,null,null);};
-/* DEKLANŞÖR */
-shutter.onclick=async()=>{
-  if(!camStream)return;
-  const vw=camEl.videoWidth,vh=camEl.videoHeight;if(!vw){toast('Kamera hazırlanıyor…');return;}
-  shutter.disabled=true;
-  const maxW=720,scale=Math.min(1,maxW/vw),cw=Math.round(vw*scale),ch=Math.round(vh*scale);
-  snap.width=cw;snap.height=ch;snap.getContext('2d').drawImage(camEl,0,0,cw,ch);
-  let data='';try{data=snap.toDataURL('image/jpeg',0.72);}catch(e){}
-  let conf=null;
-  if(cocoModel){try{const preds=await cocoModel.detect(snap,5);const c=preds.find(p=>['cat','dog','teddy bear'].includes(p.class));conf=c?Math.round(c.score*100):null;}catch(e){}}
-  shutter.disabled=false;
-  if(currentWild)catchNamed(currentWild,data,conf);
-  else catchFree(data,conf);
+camInput.onchange=()=>{
+  const file=camInput.files&&camInput.files[0];camInput.value='';
+  if(!file)return;
+  toast('Fotoğraf işleniyor…');
+  const url=URL.createObjectURL(file),im=new Image();
+  im.onload=async()=>{
+    const maxW=720,scale=Math.min(1,maxW/im.width),cw=Math.round(im.width*scale),ch=Math.round(im.height*scale);
+    snap.width=cw;snap.height=ch;snap.getContext('2d').drawImage(im,0,0,cw,ch);
+    let data='';try{data=snap.toDataURL('image/jpeg',0.72);}catch(e){data=url;}
+    let conf=null;
+    if(cocoModel){try{const preds=await cocoModel.detect(snap,5);const c=preds.find(p=>['cat','dog','teddy bear'].includes(p.class));conf=c?Math.round(c.score*100):null;}catch(e){}}
+    if(currentWild)catchNamed(currentWild,data,conf);else catchFree(data,conf);
+  };
+  im.onerror=()=>toast('Fotoğraf okunamadı, tekrar dene.');
+  im.src=url;
 };
 function catchNamed(cat,data,conf){
   caught.add(cat.id);if(data)photos[cat.id]=data;coins+=gains[cat.rar];xp+=20;syncCoins();stopCam();
