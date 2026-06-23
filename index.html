@@ -24,7 +24,6 @@
   .screen{position:absolute;inset:0;display:none;flex-direction:column}
   .screen.active{display:flex;animation:fade .3s ease}
   @keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-  .catphoto{object-fit:cover;background:var(--fb,#2a2014) center/cover}
   #leafmap{flex:1;margin:4px 14px 0;border-radius:22px;overflow:hidden;border:1px solid var(--line);background:#241a0c}
   .leaflet-container{background:#241a0c;font-family:inherit}
   .cat-marker{font-size:0;background:none;border:none}
@@ -40,60 +39,35 @@
   .ad .go{font-size:11px;font-weight:800;color:var(--orange-lt);white-space:nowrap}
   /* KAMERA */
   #catch{position:relative;background:#0d0904}
-  #cam{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#000}
-  #snap{display:none}
-  .cam-top{position:absolute;top:16px;left:14px;right:14px;display:flex;justify-content:space-between;align-items:center;color:rgba(255,255,255,.8);font-size:11px;font-weight:800;letter-spacing:1px;z-index:6}
-  .cam-top .live{display:flex;align-items:center;gap:6px}
-  .dot{width:8px;height:8px;border-radius:50%;background:var(--orange);box-shadow:0 0 8px var(--orange)}
-  .cam-tag{position:absolute;top:14%;left:50%;transform:translateX(-50%);z-index:6;background:rgba(0,0,0,.5);border:1px solid var(--line);padding:5px 14px;border-radius:30px;font-size:12px;font-weight:700;display:none}
-  .cam-tag em{font-style:normal;color:var(--orange-lt)}
-  .corner{position:absolute;width:26px;height:26px;border:2px solid rgba(255,255,255,.28);z-index:5}
-  .corner.tl{top:54px;left:18px;border-right:0;border-bottom:0}.corner.tr{top:54px;right:18px;border-left:0;border-bottom:0}
-  .corner.bl{bottom:150px;left:18px;border-right:0;border-top:0}.corner.br{bottom:150px;right:18px;border-left:0;border-top:0}
+  #snap,#work{display:none}
   .cam-start{position:absolute;inset:0;z-index:7;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:30px;text-align:center;background:radial-gradient(220px 160px at 50% 38%,rgba(255,122,24,.14),transparent),linear-gradient(180deg,#241a0d,#100a05)}
   .cam-start .camico{width:74px;height:74px;border-radius:22px;background:rgba(255,122,24,.14);border:1px solid var(--line);display:grid;place-items:center;color:var(--orange)}
   .cam-start .camico svg{width:38px;height:38px}
   .cam-start h3{font-size:18px;font-weight:800}
-  .cam-start p{font-size:12.5px;color:var(--muted);line-height:1.5;max-width:240px}
+  .cam-start p{font-size:12.5px;color:var(--muted);line-height:1.5;max-width:250px}
   .cam-start .ob{background:linear-gradient(135deg,var(--orange-lt),var(--orange-deep));color:#160f08;border:0;font-family:inherit;font-weight:800;font-size:14px;padding:13px 26px;border-radius:26px;cursor:pointer;box-shadow:0 8px 20px rgba(255,122,24,.4)}
   .cam-start .gb{background:none;border:0;color:var(--muted);font-family:inherit;font-size:12.5px;font-weight:700;text-decoration:underline;cursor:pointer}
-  .cam-err{position:absolute;inset:0;z-index:8;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:30px;text-align:center;background:linear-gradient(180deg,#241a0d,#100a05)}
-  .cam-err p{font-size:13px;color:var(--cream);line-height:1.55;max-width:260px}
-  .cam-err button{background:var(--orange);color:#160f08;border:0;font-family:inherit;font-weight:800;font-size:13px;padding:11px 22px;border-radius:22px;cursor:pointer}
-  .shutter{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);z-index:8;display:none;width:74px;height:74px;border-radius:50%;background:#fff;border:5px solid rgba(255,255,255,.35);cursor:pointer;box-shadow:0 6px 20px rgba(0,0,0,.5)}
-  .shutter:active{transform:translateX(-50%) scale(.92)}
-  .shutter::after{content:"";position:absolute;inset:8px;border-radius:50%;background:#fff;border:2px solid #160f08}
   /* ALBÜM */
   #album{padding:14px 0}
-  .album-head{padding:0 18px 8px;display:flex;align-items:baseline;justify-content:space-between}
-  .album-head h2{font-size:20px;font-weight:800}.album-head .count{font-size:12px;color:var(--muted)}
-  .album-scroll{flex:1;overflow-y:auto;padding-bottom:14px}.album-scroll::-webkit-scrollbar{display:none}
-  .shots-wrap{padding:0 14px 4px}
-  .shots-title{font-size:12px;color:var(--muted);font-weight:700;margin:4px 2px 8px}
-  .shots{display:flex;gap:9px;overflow-x:auto;padding-bottom:6px}.shots::-webkit-scrollbar{display:none}
-  .shot{flex:0 0 auto;width:84px;cursor:pointer}
-  .shot .si{width:84px;height:84px;border-radius:14px;overflow:hidden;border:1px solid var(--line);position:relative}
-  .shot .si img{width:100%;height:100%;object-fit:cover}
-  .shot .si .ok{position:absolute;bottom:3px;right:3px;font-size:8px;font-weight:800;background:var(--orange);color:#160f08;padding:1px 5px;border-radius:8px}
-  .shot .cap{font-size:9.5px;color:var(--cream);font-weight:700;margin-top:5px;text-align:center;line-height:1.2}
-  .analiz{font-size:12px;color:var(--orange-lt);font-weight:700;margin-bottom:8px}
-  .grid{padding:6px 14px 4px;display:grid;grid-template-columns:1fr 1fr;gap:11px}
-  .card{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:18px;padding:10px;position:relative;overflow:hidden;cursor:pointer;transition:transform .15s}
-  .card:active{transform:scale(.97)}.card.locked{opacity:.55}
-  .card .photo{width:100%;aspect-ratio:1;border-radius:13px;overflow:hidden;margin-bottom:8px;background:#241a0c;position:relative}
-  .card .photo img{width:100%;height:100%;object-fit:cover}
-  .card.locked .photo{display:grid;place-items:center}.card.locked .photo .q{font-size:30px;color:#5a4a33;font-weight:800}
-  .card .nm{font-size:14px;font-weight:800}.card .hb{font-size:10.5px;color:var(--muted);margin-top:1px}
-  .rar{position:absolute;top:8px;right:8px;z-index:2;font-size:8.5px;font-weight:800;letter-spacing:.6px;padding:3px 7px;border-radius:20px;text-transform:uppercase}
-  .serial{position:absolute;top:8px;left:8px;z-index:2;font-size:9px;color:#fff;font-weight:700;background:rgba(0,0,0,.45);padding:2px 6px;border-radius:10px}
-  .yours{position:absolute;bottom:8px;left:8px;z-index:2;font-size:8px;font-weight:800;background:var(--orange);color:#160f08;padding:2px 6px;border-radius:8px}
-  .card .stats{display:flex;gap:6px;margin-top:8px}
-  .pip{flex:1;height:4px;border-radius:4px;background:rgba(255,255,255,.1);overflow:hidden}.pip i{display:block;height:100%}
+  .album-head{padding:0 18px 10px;display:flex;align-items:baseline;justify-content:space-between}
+  .album-head h2{font-size:21px;font-weight:800}.album-head .count{font-size:12px;color:var(--muted)}
+  .album-scroll{flex:1;overflow-y:auto;padding:2px 14px 18px}.album-scroll::-webkit-scrollbar{display:none}
+  .caps{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+  .cap-card{border-radius:20px;overflow:hidden;border:1px solid var(--line);cursor:pointer;background:linear-gradient(160deg,#2a1d0d,#160f08);padding:9px;position:relative;transition:transform .15s}
+  .cap-card:active{transform:scale(.97)}
+  .cap-card .cp{aspect-ratio:.82;border-radius:14px;overflow:hidden;display:grid;place-items:center;position:relative}
+  .cap-card .cp img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 6px 10px rgba(0,0,0,.5))}
+  .cap-card .cn{font-size:13.5px;font-weight:800;margin-top:8px;line-height:1.15}
+  .cap-card .csub{font-size:10.5px;color:var(--orange-lt);font-weight:700;margin-top:1px}
+  .cap-card .cr{position:absolute;top:8px;right:8px;z-index:2;font-size:8px;font-weight:800;letter-spacing:.5px;padding:3px 7px;border-radius:20px;text-transform:uppercase;color:#160f08}
+  .cap-card .cs{position:absolute;top:8px;left:8px;z-index:2;font-size:8.5px;color:#fff;font-weight:700;background:rgba(0,0,0,.45);padding:2px 6px;border-radius:10px}
+  .empty{width:100%;text-align:center;color:var(--muted);font-size:13px;padding:50px 20px;line-height:1.7}
+  .empty b{color:var(--cream)}
   /* DÖVÜŞ */
   #battle{padding:14px;align-items:center;overflow-y:auto}#battle h2{font-size:20px;font-weight:800;align-self:flex-start}
   .arena{width:100%;border-radius:20px;border:1px solid var(--line);padding:16px;background:radial-gradient(200px 120px at 70% 10%,rgba(255,122,24,.12),transparent),linear-gradient(180deg,#2a1d0d,#150d05);margin-top:10px}
   .fighter{display:flex;align-items:center;gap:12px;margin:6px 0}.fighter.enemy{flex-direction:row-reverse;text-align:right}
-  .fighter .pf{width:60px;height:60px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid var(--line)}.fighter .pf img{width:100%;height:100%;object-fit:cover}
+  .fighter .pf{width:60px;height:60px;border-radius:50%;overflow:hidden;flex-shrink:0;border:2px solid var(--line);background:#241a0c}.fighter .pf img{width:100%;height:100%;object-fit:cover}
   .fighter .meta{flex:1}.fighter .nm{font-size:14px;font-weight:800}
   .hpbar{height:9px;background:rgba(255,255,255,.12);border-radius:6px;overflow:hidden;margin-top:5px}
   .hpbar i{display:block;height:100%;background:linear-gradient(90deg,#74c47a,#4fae57);transition:width .4s}.hpbar.low i{background:linear-gradient(90deg,#ff6b6b,#e8590c)}
@@ -102,37 +76,48 @@
   .pick-row{width:100%;display:flex;gap:9px;overflow-x:auto;padding:10px 0 4px}.pick-row::-webkit-scrollbar{display:none}
   .pick{flex:0 0 auto;width:66px;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:14px;padding:7px 6px;text-align:center;cursor:pointer;transition:border-color .2s,transform .15s}
   .pick.sel{border-color:var(--orange);transform:translateY(-2px)}
-  .pick .pf{width:42px;height:42px;border-radius:50%;overflow:hidden;margin:0 auto}.pick .pf img{width:100%;height:100%;object-fit:cover}.pick .pn{font-size:10px;font-weight:700;margin-top:4px}
+  .pick .pf{width:42px;height:42px;border-radius:50%;overflow:hidden;margin:0 auto;background:#241a0c}.pick .pf img{width:100%;height:100%;object-fit:cover}.pick .pn{font-size:9.5px;font-weight:700;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .battle-actions{width:100%;display:flex;gap:10px;margin-top:10px}
   .btn{flex:1;padding:13px;border:0;border-radius:14px;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer}
   .btn.primary{background:linear-gradient(135deg,var(--orange-lt),var(--orange-deep));color:#160f08}
   .btn.ghost{background:rgba(255,255,255,.07);color:var(--cream);border:1px solid var(--line)}.btn:disabled{opacity:.4;cursor:not-allowed}
-  .empty{width:100%;text-align:center;color:var(--muted);font-size:13px;padding:30px 10px;line-height:1.6}
   nav{display:flex;background:rgba(11,8,5,.9);border-top:1px solid var(--line);backdrop-filter:blur(10px);padding:9px 4px calc(9px + env(safe-area-inset-bottom))}
   nav button{flex:1;background:none;border:0;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;font-size:9.5px;font-weight:700;padding:6px 0;cursor:pointer;font-family:inherit}
   nav button .ic{font-size:21px;line-height:1}nav button.on{color:var(--orange)}nav button.on .ic{filter:drop-shadow(0 0 8px rgba(255,122,24,.6))}
-  .pop{position:absolute;inset:0;z-index:80;display:none;align-items:center;justify-content:center;background:rgba(8,5,2,.72);backdrop-filter:blur(6px)}
+  .pop{position:absolute;inset:0;z-index:80;display:none;align-items:center;justify-content:center;background:rgba(8,5,2,.78);backdrop-filter:blur(7px)}
   .pop.show{display:flex;animation:fade .25s}
   .pop-card{width:84%;max-width:310px;background:linear-gradient(180deg,#33240f,#1e150a);border:1px solid var(--line);border-radius:26px;padding:22px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.6)}
-  .pop-card .capimg{width:100%;aspect-ratio:1;border-radius:18px;overflow:hidden;margin-bottom:14px;border:2px solid var(--orange)}
-  .pop-card .capimg img{width:100%;height:100%;object-fit:cover}
-  .pop-card .burst .pf{width:96px;height:96px;border-radius:50%;overflow:hidden;margin:0 auto;border:3px solid var(--orange);box-shadow:0 0 0 7px rgba(255,122,24,.16);animation:pop .5s cubic-bezier(.2,1.4,.4,1)}
-  .pop-card .burst .pf img{width:100%;height:100%;object-fit:cover}
-  @keyframes pop{from{transform:scale(.3);opacity:0}to{transform:scale(1);opacity:1}}
-  .pop-card h3{font-size:21px;font-weight:800;margin:8px 0 2px}.pop-card .sub{font-size:12.5px;color:var(--muted);margin-bottom:12px;line-height:1.4}
-  .pop-rar{display:inline-block;font-size:10px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;padding:4px 12px;border-radius:20px;margin-bottom:12px}
-  .pop-card .reward{font-size:13px;color:var(--orange-lt);font-weight:700;margin-bottom:14px}
-  .pop-row{display:flex;gap:9px}
-  .pop-card button.main{flex:1;padding:13px;border:0;border-radius:14px;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer;background:linear-gradient(135deg,var(--orange-lt),var(--orange-deep));color:#160f08}
-  .pop-card button.alt{flex:1;padding:13px;border:1px solid var(--line);border-radius:14px;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer;background:rgba(255,255,255,.06);color:var(--cream)}
-  .detail .pop-card{text-align:left}
-  .detail .dh{display:flex;align-items:center;gap:14px;margin-bottom:14px}
-  .detail .dh .pf{width:64px;height:64px;border-radius:16px;overflow:hidden;flex-shrink:0}.detail .dh .pf img{width:100%;height:100%;object-fit:cover}
-  .detail .dh h3{font-size:19px}.detail .dh .hb{font-size:11px;color:var(--muted)}
-  .statrow{display:flex;align-items:center;margin:9px 0;font-size:12px}.statrow span{color:var(--muted);font-weight:700;width:42px}
-  .bar{flex:1;height:7px;background:rgba(255,255,255,.1);border-radius:6px;margin:0 10px;overflow:hidden}.bar i{display:block;height:100%;border-radius:6px}
-  .statrow b{width:26px;text-align:right}
-  .story{font-size:12px;color:var(--muted);line-height:1.55;margin:14px 0 4px;font-style:italic}
+  .pop-card h3{font-size:21px;font-weight:800;margin:8px 0 2px}.pop-card .sub{font-size:12.5px;color:var(--muted);margin-bottom:14px;line-height:1.4}
+  .pop-card>button{width:100%;padding:13px;border:0;border-radius:14px;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer;background:linear-gradient(135deg,var(--orange-lt),var(--orange-deep));color:#160f08}
+  /* İŞLENİYOR */
+  .proc{position:absolute;inset:0;z-index:85;display:none;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:rgba(8,5,2,.82);backdrop-filter:blur(5px)}
+  .proc.show{display:flex}
+  .spin{width:46px;height:46px;border-radius:50%;border:4px solid rgba(255,154,68,.25);border-top-color:var(--orange);animation:sp 1s linear infinite}
+  @keyframes sp{to{transform:rotate(360deg)}}
+  .proc p{font-size:13px;color:var(--cream);font-weight:700}
+  /* POKEMON KART */
+  #cardPop .cardWrap{display:flex;flex-direction:column;align-items:center;gap:14px}
+  .tcard{width:278px;height:416px;perspective:1300px;cursor:pointer;touch-action:pan-y}
+  .tcard .inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .55s cubic-bezier(.4,.2,.2,1)}
+  .tcard.flipped .inner{transform:rotateY(180deg)}
+  .cface{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;border-radius:22px;overflow:hidden;border:2px solid rgba(255,255,255,.2);box-shadow:0 20px 50px rgba(0,0,0,.55);display:flex;flex-direction:column;padding:13px}
+  .cface.back{transform:rotateY(180deg)}
+  .cardTop{display:flex;justify-content:space-between;align-items:center;margin-bottom:9px}
+  .cserial{font-size:11px;color:rgba(255,255,255,.7);font-weight:800}
+  .crar{font-size:10px;font-weight:800;letter-spacing:.6px;padding:3px 10px;border-radius:20px;text-transform:uppercase;color:#160f08}
+  .cphoto{flex:1;border-radius:15px;overflow:hidden;display:grid;place-items:center;position:relative;background:rgba(0,0,0,.18)}
+  .cphoto img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 10px 16px rgba(0,0,0,.55))}
+  .cname{font-size:19px;font-weight:800;margin-top:11px;text-align:center;color:#fff;line-height:1.1}
+  .cmeta{font-size:12px;font-weight:700;text-align:center;margin-top:3px;color:rgba(255,255,255,.85)}
+  .cback-name{font-size:17px;font-weight:800;color:#fff;margin-bottom:12px}
+  .cstat{display:flex;align-items:center;margin:9px 0;font-size:12px;color:#fff}
+  .cstat span{width:42px;color:rgba(255,255,255,.7);font-weight:700}
+  .cstat .b{flex:1;height:8px;background:rgba(0,0,0,.28);border-radius:6px;margin:0 10px;overflow:hidden}.cstat .b i{display:block;height:100%;border-radius:6px}
+  .cstat b{width:28px;text-align:right}
+  .cstory{font-size:12px;color:rgba(255,255,255,.85);font-style:italic;line-height:1.5;margin:14px 0}
+  .cfoot{margin-top:auto;font-size:10.5px;color:rgba(255,255,255,.7)}
+  .cardHint{font-size:11px;color:var(--muted)}
+  .cardClose{background:rgba(255,255,255,.1);color:var(--cream);border:1px solid var(--line);font-family:inherit;font-weight:800;font-size:13px;padding:11px 30px;border-radius:22px;cursor:pointer}
   .adwatch .screen-ad{height:150px;border-radius:14px;background:linear-gradient(135deg,#3a2a12,#241808);display:grid;place-items:center;margin-bottom:14px;position:relative;overflow:hidden}
   .adwatch .screen-ad .ph{color:var(--muted);font-size:12px;text-align:center;padding:0 16px;line-height:1.5}
   .adwatch .timer{position:absolute;top:8px;right:10px;font-size:11px;font-weight:800;color:var(--orange-lt);background:rgba(0,0,0,.4);padding:2px 8px;border-radius:20px}
@@ -162,26 +147,20 @@
       </div>
     </section>
     <section class="screen" id="catch">
-      <canvas id="snap"></canvas>
+      <canvas id="snap"></canvas><canvas id="work"></canvas>
       <div class="cam-start" id="camPanel">
         <div class="camico"><svg class="ic" viewBox="0 0 24 24"><path d="M3 8a2 2 0 0 1 2-2h2l1.5-2h7L19 6a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="12.5" r="3.4"/></svg></div>
         <h3 id="camStartTitle">Kediyi yakala</h3>
-        <p id="camStartDesc">Kameraya bas, kediyi karşına al ve telefonun deklanşörüyle fotoğrafını çek. Çektiğin foto albümüne kaydedilir.</p>
+        <p id="camStartDesc">Kameraya bas, kediyi karşına al ve deklanşörle fotoğrafını çek. Arka planı otomatik kesilir, tür analizi yapılır ve kartın albümüne eklenir.</p>
         <button class="ob" id="openCamBtn"><svg class="ic" viewBox="0 0 24 24" style="width:18px;height:18px;vertical-align:-3px"><path d="M3 8a2 2 0 0 1 2-2h2l1.5-2h7L19 6a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="12.5" r="3.2"/></svg> Kamerayı Aç</button>
         <button class="gb" id="skipCamBtn" style="display:none">Fotoğrafsız yakala</button>
-        <p style="font-size:11px;color:var(--muted);opacity:.85;max-width:250px;line-height:1.5">İlk açılışta telefon kamera iznini ister. Çıkan kutuda “İzin Ver” de; sonra deklanşörle çek.</p>
+        <p style="font-size:11px;color:var(--muted);opacity:.85;max-width:250px;line-height:1.5">İlk açılışta telefon kamera iznini ister. Çıkan kutuda “İzin Ver” de.</p>
       </div>
       <input id="camInput" type="file" accept="image/*" capture="environment" style="position:absolute;left:-9999px;width:1px;height:1px">
     </section>
     <section class="screen" id="album">
-      <div class="album-head"><h2>Pati Albümü</h2><span class="count" id="albumCount">0 / 5</span></div>
-      <div class="album-scroll">
-        <div class="shots-wrap" id="shotsWrap" style="display:none">
-          <div class="shots-title">Çektiklerim</div>
-          <div class="shots" id="shots"></div>
-        </div>
-        <div class="grid" id="grid"></div>
-      </div>
+      <div class="album-head"><h2>Çektiklerim</h2><span class="count" id="albumCount">0 kedi</span></div>
+      <div class="album-scroll"><div class="caps" id="caps"></div></div>
     </section>
     <section class="screen" id="battle">
       <h2>Sokak Kapışması</h2>
@@ -194,38 +173,31 @@
     <button data-go="album"><span class="ic"><svg class="ic" viewBox="0 0 24 24"><path d="M5 4a2 2 0 0 1 2-2h11a1 1 0 0 1 1 1v17a1 1 0 0 1-1 1H7a2 2 0 0 1-2-2z"/><path d="M5 18a2 2 0 0 1 2-2h12"/></svg></span>Albüm</button>
     <button data-go="battle"><span class="ic"><svg class="ic" viewBox="0 0 24 24"><path d="M14.5 3.5 21 10l-3 3-6.5-6.5zM3 21l6-6M6.5 17.5 3 21M9.5 14.5 13 18"/></svg></span>Dövüş</button>
   </nav>
-  <div class="pop" id="result"><div class="pop-card">
-    <div id="resBody"></div>
-    <div class="pop-row" style="margin-top:4px">
-      <button class="alt" id="resAlbum">Albüm</button>
-      <button class="main" id="resOk">Devam</button>
-    </div>
-  </div></div>
-  <div class="pop detail" id="detail"><div class="pop-card">
-    <div class="dh"><div class="pf" id="dFace"></div><div><h3 id="dName"></h3><div class="hb" id="dHab"></div></div></div>
-    <div class="statrow"><span>CAN</span><div class="bar"><i id="bHp"></i></div><b id="vHp">0</b></div>
-    <div class="statrow"><span>SAL</span><div class="bar"><i id="bAtk"></i></div><b id="vAtk">0</b></div>
-    <div class="statrow"><span>SAV</span><div class="bar"><i id="bDef"></i></div><b id="vDef">0</b></div>
-    <div class="statrow"><span>HIZ</span><div class="bar"><i id="bSpd"></i></div><b id="vSpd">0</b></div>
-    <p class="story" id="dStory"></p>
-    <button class="main" id="dClose" style="width:100%">Kapat</button>
-  </div></div>
-  <div class="pop" id="viewer"><div class="pop-card">
-    <div class="capimg" id="viewerImg"></div>
-    <div class="sub" id="viewerCap"></div>
-    <button class="main" id="viewerClose" style="width:100%">Kapat</button>
+  <div class="proc" id="proc"><div class="spin"></div><p id="procMsg">Arka plan kesiliyor…</p></div>
+  <div class="pop" id="cardPop"><div class="cardWrap">
+    <div class="tcard" id="tcard"><div class="inner">
+      <div class="cface front" id="cardFront"></div>
+      <div class="cface back" id="cardBack"></div>
+    </div></div>
+    <div class="cardHint">Çevirmek için kaydır ya da karta dokun</div>
+    <button class="cardClose" id="cardClose">Kapat</button>
   </div></div>
   <div class="pop adwatch" id="adwatch"><div class="pop-card">
     <div class="screen-ad"><span class="timer" id="adTimer">5</span><div class="ph" id="adPh">Reklam oynatılıyor…<br><small>(Yayında AdMob/AdSense ödüllü reklam buraya gelir)</small></div></div>
     <h3 style="font-size:17px">Ödüllü reklam</h3>
     <div class="sub" style="margin:4px 0 14px">İzlemeyi tamamla, jetonunu al.</div>
-    <button class="main" id="adClaim" style="width:100%" disabled>Bekle…</button>
+    <button id="adClaim" disabled>Bekle…</button>
   </div></div>
   <div class="toast" id="toast"></div>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
 const PX="?auto=compress&cs=tinysrgb&w=600";
+const RAR={yaygin:{tr:'YAYGIN',col:'#b0a08a',grad:'linear-gradient(160deg,#4a4a55,#2a2a33)'},
+  nadir:{tr:'NADİR',col:'#74c47a',grad:'linear-gradient(160deg,#2e6b46,#163a26)'},
+  ender:{tr:'ENDER',col:'#5aa8ff',grad:'linear-gradient(160deg,#2a5a8f,#13314f)'},
+  destansi:{tr:'DESTANSI',col:'#c07bff',grad:'linear-gradient(160deg,#5a3a8f,#2e1d4f)'},
+  efsane:{tr:'EFSANE',col:'#ffcf4a',grad:'linear-gradient(160deg,#b8862a,#6b4a12)'}};
 const CATS=[
  {id:'tekir',name:'Tekir',rar:'yaygin',hab:'Çarşı arası',cls:'İzci',el:'Toprak',hp:62,atk:40,def:55,spd:48,fb:'#9a8a72',photo:'https://images.pexels.com/photos/33585484/pexels-photo-33585484.jpeg'+PX,story:'Mahallenin her köşesini ezbere bilen, kasap önünün sakin müdavimi.'},
  {id:'sarman',name:'Sarman',rar:'nadir',hab:'Balıkçı iskelesi',cls:'Korsan',el:'Ateş',hp:70,atk:62,def:44,spd:58,fb:'#ff8a3d',photo:'https://images.pexels.com/photos/14572715/pexels-photo-14572715.jpeg'+PX,story:'Sabah ezanından önce iskeleye inen, balıkçıların gözdesi turuncu afacan.'},
@@ -233,18 +205,26 @@ const CATS=[
  {id:'zeytin',name:'Zeytin',rar:'destansi',hab:'Apartman aralığı',cls:'Gölge',el:'Karanlık',hp:88,atk:78,def:66,spd:84,fb:'#2f2a33',photo:'https://images.pexels.com/photos/16412582/pexels-photo-16412582.jpeg'+PX,story:'Geceleri çatılarda dolaşan, sokak lambası söndüğünde görünen kapkara hayalet.'},
  {id:'sultan',name:'Sultan',rar:'efsane',hab:'Eski hamam',cls:'Hükümdar',el:'Altın',hp:100,atk:92,def:88,spd:76,fb:'#d6a64a',photo:'https://images.pexels.com/photos/30002405/pexels-photo-30002405.jpeg'+PX,story:'Mahallenin efsanesi. Yıllardır kimse yakalayamadı; gören oldu mu o da meçhul.'}
 ];
-const RAR={yaygin:{tr:'YAYGIN',col:'var(--common)'},nadir:{tr:'NADİR',col:'var(--uncommon)'},ender:{tr:'ENDER',col:'var(--rare)'},destansi:{tr:'DESTANSI',col:'var(--epic)'},efsane:{tr:'EFSANE',col:'var(--legendary)'}};
-const gains={yaygin:15,nadir:30,ender:55,destansi:90,efsane:150};
-function srcOf(cat){return (photos[cat.id]||cat.photo);}
-function img(cat){return `<img class="catphoto" src="${srcOf(cat)}" alt="${cat.name}" loading="lazy" style="--fb:${cat.fb}">`;}
-let coins=120,xp=0;const caught=new Set();let photos={},pmeta={},shots=[];
-function save(){try{localStorage.setItem('patiavi',JSON.stringify({coins,xp,caught:[...caught],photos,pmeta}));}catch(e){}}
-function saveShots(){try{shots=shots.slice(-24);localStorage.setItem('patiavi_shots',JSON.stringify(shots));}catch(e){}}
-function load(){try{const d=JSON.parse(localStorage.getItem('patiavi'));if(d){coins=d.coins??120;xp=d.xp??0;(d.caught||[]).forEach(id=>caught.add(id));photos=d.photos||{};pmeta=d.pmeta||{};}}catch(e){}
-  try{shots=JSON.parse(localStorage.getItem('patiavi_shots')||'[]');}catch(e){shots=[];}}
-load();
+const CLASSES=['İzci','Korsan','Şifacı','Gölge','Bekçi','Hayalet','Aylak','Hükümdar'];
+const ELEMENTS=['Toprak','Ateş','Işık','Karanlık','Altın','Rüzgar','Su'];
+const HABITATS=['Çarşı arası','Balıkçı iskelesi','Cami avlusu','Apartman aralığı','Park köşesi','Pazar yeri','Sahil kenarı','Kahve önü'];
+const STORIES=['Sokakların sessiz gözcüsü, her köşeyi tanır.','Mahallenin en cesur avcısı; kimseden çekinmez.','Güneşli duvarların tembel kralı.','Gece çatılarda dolaşan gizemli bir gölge.','Balık kokusunu kilometrelerce öteden alır.','Komşuların beslediği, herkesin sevgilisi bir pati.'];
+function rnd(a,b){return Math.floor(a+Math.random()*(b-a+1));}
+function pick(a){return a[Math.floor(Math.random()*a.length)];}
+function rollRarity(){const r=Math.random();return r<0.5?'yaygin':r<0.78?'nadir':r<0.93?'ender':r<0.99?'destansi':'efsane';}
+function genStats(rar){const b={yaygin:[40,64],nadir:[48,74],ender:[58,84],destansi:[70,92],efsane:[84,100]}[rar];
+  return {hp:rnd(b[0],b[1]),atk:rnd(b[0],b[1]),def:rnd(b[0],b[1]),spd:rnd(b[0],b[1])};}
+
+let coins=120,xp=0,captures=[],seq=0;
+function save(){try{localStorage.setItem('patiavi_meta',JSON.stringify({coins,xp,seq}));}catch(e){}}
+function saveCaps(){try{captures=captures.slice(-16);localStorage.setItem('patiavi_caps',JSON.stringify(captures));}catch(e){
+  while(captures.length>4){captures.shift();try{localStorage.setItem('patiavi_caps',JSON.stringify(captures));return;}catch(e2){}}}}
+function loadAll(){try{const m=JSON.parse(localStorage.getItem('patiavi_meta'));if(m){coins=m.coins??120;xp=m.xp??0;seq=m.seq??0;}}catch(e){}
+  try{captures=JSON.parse(localStorage.getItem('patiavi_caps')||'[]');}catch(e){captures=[];}}
+loadAll();
 function syncCoins(){document.getElementById('coinCount').textContent=coins;save();}
 syncCoins();
+function caughtIds(){return new Set(captures.filter(c=>c.catId).map(c=>c.catId));}
 /* HARİTA */
 let map,youMarker,spawnLayer;const ISTANBUL=[41.0082,28.9784];
 function initMap(center){
@@ -256,22 +236,21 @@ function initMap(center){
   setTimeout(()=>map.invalidateSize(),200);setTimeout(()=>map.invalidateSize(),600);
 }
 function placeSpawns(center){
-  if(!spawnLayer)return;spawnLayer.clearLayers();
+  if(!spawnLayer)return;spawnLayer.clearLayers();const got=caughtIds();
   CATS.forEach((cat,i)=>{
-    if(caught.has(cat.id))return;
+    if(got.has(cat.id))return;
     const ang=(i/CATS.length)*Math.PI*2,r=0.0035+(i%3)*0.0012;
     const ll=[center[0]+Math.sin(ang)*r,center[1]+Math.cos(ang)*r];
-    const m=L.marker(ll,{icon:L.divIcon({className:'cat-marker',html:`<div class="cat-pin">${img(cat)}</div>`,iconSize:[50,50]})});
+    const m=L.marker(ll,{icon:L.divIcon({className:'cat-marker',html:`<div class="cat-pin"><img src="${cat.photo}"></div>`,iconSize:[50,50]})});
     m.on('click',()=>enterCamera(cat));spawnLayer.addLayer(m);
   });
 }
 function setupGeo(){
   const note=document.getElementById('geoNote');
   if(!navigator.geolocation){initMap(ISTANBUL);note.textContent='Konum desteklenmiyor · örnek konum gösteriliyor';return;}
-  note.textContent='Konum alınıyor…';
   navigator.geolocation.getCurrentPosition(
     p=>{initMap([p.coords.latitude,p.coords.longitude]);note.textContent='📍 Gerçek konumun kullanılıyor';},
-    err=>{initMap(ISTANBUL);note.textContent=(err&&err.code===1)?'Konum izni kapalı · örnek konum (İstanbul) gösteriliyor':'Konum alınamadı · örnek konum gösteriliyor';},
+    err=>{initMap(ISTANBUL);note.textContent=(err&&err.code===1)?'Konum izni kapalı · örnek konum (İstanbul)':'Konum alınamadı · örnek konum';},
     {enableHighAccuracy:true,timeout:15000,maximumAge:60000});
 }
 setupGeo();
@@ -287,21 +266,30 @@ function show(id){
   if(id==='album')renderAlbum();
   if(id==='battle')renderBattleHome();
   if(id==='map'&&map)setTimeout(()=>map.invalidateSize(),120);
-  if(id==='catch')enterCamera(null);else stopCam();
+  if(id==='catch')enterCamera(null);
 }
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>show(b.dataset.go));
-/* KAMERA (telefonun kendi kamerası) + tür analizi */
-let mobilenetModel=null,currentWild=null;
-const snap=document.getElementById('snap'),camInput=document.getElementById('camInput');
-(function loadModel(){
+/* MODELLER */
+let mobilenetModel=null,deepModel=null,deepTried=false;
+(function loadModels(){
   const tf=document.createElement('script');tf.src='https://cdnjs.cloudflare.com/ajax/libs/tensorflow/4.22.0/tf.min.js';
-  tf.onload=()=>{const mn=document.createElement('script');mn.src='https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.0/dist/mobilenet.min.js';
-    mn.onload=()=>{if(window.mobilenet)mobilenet.load().then(m=>mobilenetModel=m).catch(()=>{});};document.body.appendChild(mn);};
+  tf.onload=()=>{
+    const mn=document.createElement('script');mn.src='https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.0/dist/mobilenet.min.js';
+    mn.onload=()=>{if(window.mobilenet)mobilenet.load().then(m=>mobilenetModel=m).catch(()=>{});};document.body.appendChild(mn);
+    const dl=document.createElement('script');dl.src='https://cdn.jsdelivr.net/npm/@tensorflow-models/deeplab@0.2.1/dist/index.min.js';
+    document.body.appendChild(dl);
+  };
   document.body.appendChild(tf);
 })();
-function dominantColor(){
-  try{
-    const ctx=snap.getContext('2d'),w=snap.width,h=snap.height;
+async function ensureDeep(){
+  if(deepModel)return deepModel;
+  if(!window.deeplab)return null;
+  try{deepModel=await deeplab.load({base:'pascal',quantizationBytes:2});}catch(e){deepModel=null;}
+  return deepModel;
+}
+/* RENK + TÜR */
+function dominantColor(cv){
+  try{const ctx=cv.getContext('2d'),w=cv.width,h=cv.height;
     const sx=Math.floor(w*0.3),sy=Math.floor(h*0.3),sw=Math.max(1,Math.floor(w*0.4)),sh=Math.max(1,Math.floor(h*0.4));
     const d=ctx.getImageData(sx,sy,sw,sh).data;let r=0,g=0,b=0,n=0;
     for(let i=0;i<d.length;i+=16){r+=d[i];g+=d[i+1];b+=d[i+2];n++;}
@@ -310,141 +298,152 @@ function dominantColor(){
     if(max<68)return 'kara';
     if(r>118&&r>g+16&&g>=b)return 'sarman';
     if(Math.abs(r-g)<24&&Math.abs(g-b)<24)return 'gri';
-    if(r>g&&g>b)return 'sarı tekir';
-    return '';
-  }catch(e){return '';}
+    if(r>g&&g>b)return 'sarı';
+    return '';}catch(e){return '';}
 }
-async function analyzeCat(){
-  const color=dominantColor();let breed='tekir',conf=null,isCat=false;
-  if(mobilenetModel){
-    try{
-      const preds=await mobilenetModel.classify(snap,5);
-      const map=[['tabby','tekir'],['tiger cat','tekir'],['egyptian cat','tekir'],['persian cat','İran kedisi'],['siamese','Siyam kedisi'],['angora','Ankara kedisi']];
-      for(const p of preds){const cn=(p.className||'').toLowerCase();
-        for(const[k,tr]of map){if(cn.includes(k)){breed=tr;conf=Math.round(p.probability*100);isCat=true;break;}}
-        if(isCat)break;}
-      if(!isCat){const c=preds.find(p=>(p.className||'').toLowerCase().includes('cat'));
-        if(c){breed='tekir';conf=Math.round(c.probability*100);isCat=true;}}
-    }catch(e){}
-  }
-  const parts=[];if(color)parts.push(color);parts.push(breed);
-  let label=parts.join(' ');label=label.charAt(0).toUpperCase()+label.slice(1);
+async function analyze(cv){
+  const color=dominantColor(cv);let breed='tekir',conf=null,isCat=false;
+  if(mobilenetModel){try{
+    const preds=await mobilenetModel.classify(cv,5);
+    const map=[['tabby','tekir'],['tiger cat','tekir'],['egyptian cat','tekir'],['persian cat','İran kedisi'],['siamese','Siyam kedisi'],['angora','Ankara kedisi']];
+    for(const p of preds){const cn=(p.className||'').toLowerCase();
+      for(const[k,tr]of map){if(cn.includes(k)){breed=tr;conf=Math.round(p.probability*100);isCat=true;break;}}
+      if(isCat)break;}
+    if(!isCat){const c=preds.find(p=>(p.className||'').toLowerCase().includes('cat'));if(c){breed='tekir';conf=Math.round(c.probability*100);isCat=true;}}
+  }catch(e){}}
+  let label=((color?color+' ':'')+breed);label=label.charAt(0).toUpperCase()+label.slice(1);
   return {label,conf,isCat};
 }
-function stopCam(){}
+/* ARKA PLAN KESME (deeplab) */
+async function cutout(srcCanvas){
+  const model=await ensureDeep();
+  if(!model)return null;
+  try{
+    const out=await model.segment(srcCanvas);
+    const {legend,width,height,segmentationMap}=out;
+    let target=legend['cat'];
+    if(!target){const keys=Object.keys(legend||{}).filter(k=>k!=='background');if(keys.length)target=legend[keys[0]];}
+    if(!target)return null;
+    const seg=document.createElement('canvas');seg.width=width;seg.height=height;
+    seg.getContext('2d').putImageData(new ImageData(new Uint8ClampedArray(segmentationMap),width,height),0,0);
+    const segData=seg.getContext('2d').getImageData(0,0,width,height).data;
+    const ow=Math.min(480,srcCanvas.width),scale=ow/srcCanvas.width,oh=Math.round(srcCanvas.height*scale);
+    const o=document.createElement('canvas');o.width=ow;o.height=oh;const octx=o.getContext('2d');
+    octx.drawImage(srcCanvas,0,0,ow,oh);
+    const od=octx.getImageData(0,0,ow,oh),px=od.data;let hit=0;
+    for(let y=0;y<oh;y++){const sy=Math.min(height-1,Math.floor(y/oh*height));
+      for(let x=0;x<ow;x++){const sx=Math.min(width-1,Math.floor(x/ow*width));const si=(sy*width+sx)*4;
+        if(!(segData[si]===target[0]&&segData[si+1]===target[1]&&segData[si+2]===target[2])){px[(y*ow+x)*4+3]=0;}else hit++;}}
+    if(hit<ow*oh*0.02)return null;
+    octx.putImageData(od,0,0);
+    return o.toDataURL('image/png');
+  }catch(e){return null;}
+}
+/* KAMERA */
+let currentWild=null;
+const snap=document.getElementById('snap'),camInput=document.getElementById('camInput');
 function enterCamera(target){
   currentWild=target;
   document.getElementById('camStartTitle').textContent=target?(target.name+' karşında'):'Sokak kedisi yakala';
-  document.getElementById('camStartDesc').textContent=target?(target.name+' karşında. Kameraya bas, fotoğrafını çek; bu kedi senin çektiğin fotoğrafla albüme girer.'):'Kameraya bas, kediyi karşına al ve telefonun deklanşörüyle fotoğrafını çek. Çektiğin foto albümüne kaydedilir.';
   document.getElementById('skipCamBtn').style.display=target?'inline-block':'none';
 }
 document.getElementById('openCamBtn').onclick=()=>camInput.click();
-document.getElementById('skipCamBtn').onclick=()=>{if(currentWild)catchNamed(currentWild,null,null);};
+document.getElementById('skipCamBtn').onclick=()=>{if(currentWild)finishCapture(currentWild,null,{label:'',conf:null});};
 camInput.onchange=()=>{
   const file=camInput.files&&camInput.files[0];camInput.value='';
   if(!file)return;
-  toast('Fotoğraf işleniyor…');
   const url=URL.createObjectURL(file),im=new Image();
   im.onload=async()=>{
     const maxW=720,scale=Math.min(1,maxW/im.width),cw=Math.round(im.width*scale),ch=Math.round(im.height*scale);
     snap.width=cw;snap.height=ch;snap.getContext('2d').drawImage(im,0,0,cw,ch);
-    let data='';try{data=snap.toDataURL('image/jpeg',0.72);}catch(e){data=url;}
-    const a=await analyzeCat();
-    if(currentWild)catchNamed(currentWild,data,a);else catchFree(data,a);
+    showProc('Tür analiz ediliyor…');
+    const a=await analyze(snap);
+    showProc('Arka plan kesiliyor…');
+    let cut=null;try{cut=await cutout(snap);}catch(e){}
+    let fallback='';try{fallback=snap.toDataURL('image/jpeg',0.72);}catch(e){fallback=url;}
+    hideProc();
+    finishCapture(currentWild,cut||fallback,a);
   };
-  im.onerror=()=>toast('Fotoğraf okunamadı, tekrar dene.');
+  im.onerror=()=>{hideProc();toast('Fotoğraf okunamadı, tekrar dene.');};
   im.src=url;
 };
-function catchNamed(cat,data,a){
-  a=a||{label:'',conf:null};
-  caught.add(cat.id);if(data)photos[cat.id]=data;if(a.label)pmeta[cat.id]={label:a.label,conf:a.conf};
-  coins+=gains[cat.rar];xp+=20;syncCoins();stopCam();
-  const r=RAR[cat.rar];
-  document.getElementById('resBody').innerHTML=`
-    ${data?`<div class="capimg"><img src="${data}"></div>`:`<div class="burst"><div class="pf">${img(cat)}</div></div>`}
-    <h3>${cat.name}</h3>
-    ${a.label?`<div class="analiz">Tür: <b>${a.label}</b>${a.conf?(' · %'+a.conf+' güven'):''}</div>`:''}
-    <div class="sub">${cat.hab}</div>
-    <span class="pop-rar" style="background:${r.col};color:#160f08">${r.tr}</span>
-    <div class="reward">+${gains[cat.rar]} jeton · +20 XP</div>`;
-  document.getElementById('result').classList.add('show');
-}
-function catchFree(data,a){
-  a=a||{label:'Sokak kedisi',conf:null};
-  coins+=10;xp+=10;syncCoins();
-  shots.push({img:data,ts:Date.now(),conf:a.conf,type:a.label});saveShots();stopCam();
-  document.getElementById('resBody').innerHTML=`
-    <div class="capimg"><img src="${data}"></div>
-    <h3>${a.label||'Sokak kedisi'}</h3>
-    <div class="analiz">${a.conf?('Analiz: %'+a.conf+' güven · '):'Analiz tamam · '}Çektiklerim albümüne kaydedildi.</div>
-    <div class="reward">+10 jeton · +10 XP</div>`;
-  document.getElementById('result').classList.add('show');
-}
-document.getElementById('resOk').onclick=()=>{document.getElementById('result').classList.remove('show');
+function showProc(m){document.getElementById('procMsg').textContent=m;document.getElementById('proc').classList.add('show');}
+function hideProc(){document.getElementById('proc').classList.remove('show');}
+/* YAKALAMA -> KART */
+function finishCapture(target,imgData,a){
+  seq++;
+  let cap;
+  if(target){
+    cap={cid:seq,catId:target.id,name:target.name,type:a.label||target.name,conf:a.conf,rar:target.rar,cls:target.cls,el:target.el,
+      hp:target.hp,atk:target.atk,def:target.def,spd:target.spd,story:target.story,hab:target.hab,img:imgData||target.photo,ts:Date.now()};
+    coins+=({yaygin:15,nadir:30,ender:55,destansi:90,efsane:150})[target.rar];xp+=20;
+  }else{
+    const rar=rollRarity(),st=genStats(rar);
+    cap={cid:seq,catId:null,name:a.label||'Sokak kedisi',type:a.label||'Sokak kedisi',conf:a.conf,rar,cls:pick(CLASSES),el:pick(ELEMENTS),
+      hp:st.hp,atk:st.atk,def:st.def,spd:st.spd,story:pick(STORIES),hab:pick(HABITATS),img:imgData,ts:Date.now()};
+    coins+=15;xp+=12;
+  }
+  captures.push(cap);saveCaps();syncCoins();
   if(map){const c=youMarker?youMarker.getLatLng():{lat:ISTANBUL[0],lng:ISTANBUL[1]};placeSpawns([c.lat,c.lng]);}
-  enterCamera(null);};
-document.getElementById('resAlbum').onclick=()=>{document.getElementById('result').classList.remove('show');
-  if(map){const c=youMarker?youMarker.getLatLng():{lat:ISTANBUL[0],lng:ISTANBUL[1]};placeSpawns([c.lat,c.lng]);}
-  show('album');};
+  openCard(cap,true);
+}
+/* POKEMON KART */
+const tcard=document.getElementById('tcard');
+function cardFace(cap,back){
+  const r=RAR[cap.rar];
+  if(!back){
+    return `<div class="cardTop"><span class="cserial">#${String(cap.cid).padStart(4,'0')}</span><span class="crar" style="background:${r.col}">${r.tr}</span></div>
+      <div class="cphoto"><img src="${cap.img}" alt="${cap.name}"></div>
+      <div class="cname">${cap.name}</div>
+      <div class="cmeta">${cap.cls} · ${cap.el}${cap.conf?(' · %'+cap.conf):''}</div>`;
+  }
+  const bar=(v,c)=>`<div class="cstat"><span>${''}</span></div>`;
+  const row=(lbl,v,c)=>`<div class="cstat"><span>${lbl}</span><div class="b"><i style="width:${v}%;background:${c}"></i></div><b>${v}</b></div>`;
+  const d=new Date(cap.ts);
+  return `<div class="cback-name">${cap.name}</div>
+    ${row('CAN',cap.hp,'var(--orange)')}${row('SAL',cap.atk,'#ff6b6b')}${row('SAV',cap.def,'#6ba8ff')}${row('HIZ',cap.spd,'#ffce6b')}
+    <div class="cstory">“${cap.story}”</div>
+    <div class="cfoot">${cap.hab} · ${cap.type}<br>Yakalandı: ${d.toLocaleDateString('tr-TR')} ${d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})}</div>`;
+}
+function openCard(cap,fresh){
+  const r=RAR[cap.rar];
+  const f=document.getElementById('cardFront'),b=document.getElementById('cardBack');
+  f.style.background=r.grad;b.style.background=r.grad;
+  f.innerHTML=cardFace(cap,false);b.innerHTML=cardFace(cap,true);
+  tcard.classList.remove('flipped');
+  document.getElementById('cardPop').classList.add('show');
+  if(fresh)toast('Yakalandı! Karta bak, çevirmek için kaydır.');
+}
+let cardSX=null;
+tcard.addEventListener('touchstart',e=>{cardSX=e.touches[0].clientX;},{passive:true});
+tcard.addEventListener('touchend',e=>{if(cardSX==null)return;const dx=e.changedTouches[0].clientX-cardSX;cardSX=null;if(Math.abs(dx)>40)tcard.classList.toggle('flipped');});
+tcard.addEventListener('click',()=>tcard.classList.toggle('flipped'));
+document.getElementById('cardClose').onclick=()=>document.getElementById('cardPop').classList.remove('show');
 /* ALBÜM */
-const grid=document.getElementById('grid');
 function renderAlbum(){
-  document.getElementById('albumCount').textContent=`${caught.size} / ${CATS.length}`;
-  const sw=document.getElementById('shotsWrap'),sc=document.getElementById('shots');
-  if(shots.length){sw.style.display='block';sc.innerHTML='';
-    [...shots].reverse().forEach(s=>{const d=document.createElement('div');d.className='shot';
-      d.innerHTML=`<div class="si"><img src="${s.img}">${s.conf?`<span class="ok">%${s.conf}</span>`:''}</div><div class="cap">${s.type||'Sokak kedisi'}</div>`;
-      d.onclick=()=>openViewer(s);sc.appendChild(d);});
-  }else sw.style.display='none';
-  grid.innerHTML='';
-  CATS.forEach((cat,i)=>{
-    const got=caught.has(cat.id),r=RAR[cat.rar],serial='#'+String(i+1).padStart(4,'0'),own=!!photos[cat.id];
-    const card=document.createElement('div');card.className='card'+(got?'':' locked');
-    card.innerHTML=`
-      <div class="photo">
-        <span class="serial">${got?serial:'#????'}</span>
-        <span class="rar" style="background:${r.col};color:#160f08">${got?r.tr:'???'}</span>
-        ${got?img(cat):'<span class="q">?</span>'}
-        ${own?'<span class="yours">senin fotoğrafın</span>':''}
+  const wrap=document.getElementById('caps');
+  document.getElementById('albumCount').textContent=`${captures.length} kedi`;
+  if(!captures.length){wrap.innerHTML=`<div class="empty"><b>Henüz kedi yok.</b><br>Av sekmesinden ya da haritadan bir kedi çek; arka planı kesilip kartın buraya gelsin.</div>`;return;}
+  wrap.innerHTML='';
+  [...captures].reverse().forEach(cap=>{const r=RAR[cap.rar];
+    const d=document.createElement('div');d.className='cap-card';
+    d.innerHTML=`<div class="cp" style="background:${r.grad}">
+        <span class="cs">#${String(cap.cid).padStart(4,'0')}</span>
+        <span class="cr" style="background:${r.col}">${r.tr}</span>
+        <img src="${cap.img}" alt="${cap.name}">
       </div>
-      <div class="nm">${got?cat.name:'?????'}</div>
-      <div class="hb">${got?cat.hab:'Henüz bulunamadı'}</div>
-      ${got&&pmeta[cat.id]?`<div class="hb" style="color:var(--orange-lt)">Tür: ${pmeta[cat.id].label}${pmeta[cat.id].conf?(' · %'+pmeta[cat.id].conf):''}</div>`:''}
-      <div class="stats">
-        <div class="pip"><i style="width:${got?cat.hp:0}%;background:var(--orange)"></i></div>
-        <div class="pip"><i style="width:${got?cat.atk:0}%;background:#ff6b6b"></i></div>
-        <div class="pip"><i style="width:${got?cat.def:0}%;background:#6ba8ff"></i></div>
-        <div class="pip"><i style="width:${got?cat.spd:0}%;background:#ffce6b"></i></div>
-      </div>`;
-    if(got)card.onclick=()=>openDetail(cat,serial);
-    grid.appendChild(card);
+      <div class="cn">${cap.name}</div>
+      <div class="csub">${cap.cls} · ${cap.el}</div>`;
+    d.onclick=()=>openCard(cap,false);
+    wrap.appendChild(d);
   });
 }
-function openViewer(s){
-  document.getElementById('viewerImg').innerHTML=`<img src="${s.img}">`;
-  const d=new Date(s.ts);
-  document.getElementById('viewerCap').innerHTML=`<b style="color:var(--orange-lt)">${s.type||'Sokak kedisi'}</b>${s.conf?(' · %'+s.conf+' güven'):''}<br>${d.toLocaleDateString('tr-TR')} ${d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})}`;
-  document.getElementById('viewer').classList.add('show');
-}
-document.getElementById('viewerClose').onclick=()=>document.getElementById('viewer').classList.remove('show');
-function openDetail(cat,serial){
-  document.getElementById('dFace').innerHTML=img(cat);
-  document.getElementById('dName').textContent=cat.name;
-  document.getElementById('dHab').textContent=`${cat.hab} · ${serial} · ${cat.cls} / ${cat.el}`;
-  const set=(b,v,c)=>{const el=document.getElementById(b);el.style.width=v+'%';el.style.background=c;};
-  set('bHp',cat.hp,'var(--orange)');set('bAtk',cat.atk,'#ff6b6b');set('bDef',cat.def,'#6ba8ff');set('bSpd',cat.spd,'#ffce6b');
-  document.getElementById('vHp').textContent=cat.hp;document.getElementById('vAtk').textContent=cat.atk;
-  document.getElementById('vDef').textContent=cat.def;document.getElementById('vSpd').textContent=cat.spd;
-  document.getElementById('dStory').textContent='“'+cat.story+'”';
-  document.getElementById('detail').classList.add('show');
-}
-document.getElementById('dClose').onclick=()=>document.getElementById('detail').classList.remove('show');
 /* DÖVÜŞ */
-const battleBody=document.getElementById('battleBody');let myFighter=null,enemy=null,busy=false;
+const battleBody=document.getElementById('battleBody');let myF=null,enemy=null,busy=false;
+function capImg(c){return `<img src="${c.img}" alt="${c.name}">`;}
 function renderBattleHome(){
-  const mine=CATS.filter(c=>caught.has(c.id));
-  if(mine.length===0){battleBody.innerHTML=`<div class="empty">Önce bir pati yakala.<br>Yakaladığın kedilerle sokak kapışmasına çıkabilirsin.</div>`;return;}
-  if(!myFighter||!caught.has(myFighter.id))myFighter=mine[0];
+  if(!captures.length){battleBody.innerHTML=`<div class="empty"><b>Önce bir kedi yakala.</b><br>Yakaladığın kedilerle sokak kapışmasına çıkabilirsin.</div>`;return;}
+  if(!myF||!captures.find(c=>c.cid===myF.cid))myF=captures[captures.length-1];
   enemy=enemy||randomEnemy();
   battleBody.innerHTML=`
     <div class="pick-row" id="pickRow"></div>
@@ -452,45 +451,40 @@ function renderBattleHome(){
     <div class="log" id="log">Rakibin: <b style="color:var(--orange-lt)">${enemy.name}</b>. Saldır ya da yeni rakip ara.</div>
     <div class="battle-actions"><button class="btn primary" id="atkBtn">Saldır</button><button class="btn ghost" id="newBtn">Yeni rakip</button></div>`;
   const pr=document.getElementById('pickRow');
-  mine.forEach(c=>{const d=document.createElement('div');d.className='pick'+(c.id===myFighter.id?' sel':'');
-    d.innerHTML=`<div class="pf">${img(c)}</div><div class="pn">${c.name}</div>`;d.onclick=()=>{myFighter=c;resetFight();};pr.appendChild(d);});
+  [...captures].reverse().forEach(c=>{const d=document.createElement('div');d.className='pick'+(c.cid===myF.cid?' sel':'');
+    d.innerHTML=`<div class="pf">${capImg(c)}</div><div class="pn">${c.name}</div>`;d.onclick=()=>{myF=c;resetFight();};pr.appendChild(d);});
   resetFight();
   document.getElementById('atkBtn').onclick=attack;
   document.getElementById('newBtn').onclick=()=>{enemy=randomEnemy();resetFight();log(`Yeni rakip: <b style="color:var(--orange-lt)">${enemy.name}</b>`);};
 }
-function randomEnemy(){return JSON.parse(JSON.stringify(CATS[Math.floor(Math.random()*CATS.length)]));}
+function randomEnemy(){const t=CATS[Math.floor(Math.random()*CATS.length)];return {name:t.name,hp:t.hp,atk:t.atk,def:t.def,spd:t.spd,img:t.photo};}
 function resetFight(){
-  busy=false;myFighter._hp=myFighter.hp;enemy._hp=enemy.hp;drawFighters();
-  const mine=CATS.filter(c=>caught.has(c.id));
-  document.querySelectorAll('#pickRow .pick').forEach((d,i)=>d.classList.toggle('sel',mine[i].id===myFighter.id));
+  busy=false;myF._hp=myF.hp;enemy._hp=enemy.hp;drawFighters();
+  document.querySelectorAll('#pickRow .pick').forEach((d,i)=>{const arr=[...captures].reverse();d.classList.toggle('sel',arr[i]&&arr[i].cid===myF.cid);});
   const ab=document.getElementById('atkBtn');if(ab)ab.disabled=false;
 }
 function drawFighters(){
   const me=document.getElementById('meF'),en=document.getElementById('enF');
   const pct=f=>Math.max(0,Math.round(f._hp/f.hp*100));
-  me.innerHTML=`<div class="pf">${img(myFighter)}</div><div class="meta"><div class="nm">${myFighter.name}</div><div class="hpbar ${pct(myFighter)<35?'low':''}"><i style="width:${pct(myFighter)}%"></i></div></div>`;
-  en.innerHTML=`<div class="pf">${img(enemy)}</div><div class="meta"><div class="nm">${enemy.name}</div><div class="hpbar ${pct(enemy)<35?'low':''}"><i style="width:${pct(enemy)}%"></i></div></div>`;
+  me.innerHTML=`<div class="pf">${capImg(myF)}</div><div class="meta"><div class="nm">${myF.name}</div><div class="hpbar ${pct(myF)<35?'low':''}"><i style="width:${pct(myF)}%"></i></div></div>`;
+  en.innerHTML=`<div class="pf"><img src="${enemy.img}"></div><div class="meta"><div class="nm">${enemy.name}</div><div class="hpbar ${pct(enemy)<35?'low':''}"><i style="width:${pct(enemy)}%"></i></div></div>`;
 }
 function dmg(a,d){const base=a.atk*(0.85+Math.random()*0.3),red=d.def/(d.def+60);return Math.max(4,Math.round(base*(1-red)));}
 function log(t){document.getElementById('log').innerHTML=t;}
 function attack(){
   if(busy)return;busy=true;document.getElementById('atkBtn').disabled=true;
-  const first=myFighter.spd>=enemy.spd;
-  const seq=first?[[myFighter,enemy],[enemy,myFighter]]:[[enemy,myFighter],[myFighter,enemy]];
-  let i=0;
+  const first=myF.spd>=enemy.spd,seq2=first?[[myF,enemy],[enemy,myF]]:[[enemy,myF],[myF,enemy]];let i=0;
   const step=()=>{
-    if(i>=seq.length){busy=false;document.getElementById('atkBtn').disabled=false;return;}
-    const[a,d]=seq[i];
-    if(a._hp<=0){i++;return step();}
+    if(i>=seq2.length){busy=false;document.getElementById('atkBtn').disabled=false;return;}
+    const[a,d]=seq2[i];if(a._hp<=0){i++;return step();}
     const hit=dmg(a,d);d._hp-=hit;drawFighters();
     log(`${a.name} saldırdı · <b style="color:#ff8a6b">-${hit} CAN</b>`);
     if(d._hp<=0){drawFighters();
-      if(d===enemy){coins+=20;syncCoins();log(`🏆 <b>${myFighter.name}</b> kazandı! +20 jeton`);}
+      if(d===enemy){coins+=20;syncCoins();log(`🏆 <b>${myF.name}</b> kazandı! +20 jeton`);}
       else log(`💢 <b>${enemy.name}</b> seni yendi. Tekrar dene.`);
       busy=false;return;}
     i++;setTimeout(step,650);
-  };
-  step();
+  };step();
 }
 /* REKLAM */
 document.getElementById('adBanner').onclick=()=>{
@@ -500,7 +494,7 @@ document.getElementById('adBanner').onclick=()=>{
   const iv=setInterval(()=>{s--;t.textContent=s;if(s<=0){clearInterval(iv);btn.disabled=false;btn.textContent='+30 jeton al';document.getElementById('adPh').innerHTML='Reklam tamamlandı ✓';}},1000);
   btn.onclick=()=>{coins+=30;syncCoins();m.classList.remove('show');toast('+30 jeton · teşekkürler!');};
 };
-let tT;function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('show'),2200);}
+let tT;function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('show'),2400);}
 renderAlbum();
 </script>
 </body>
