@@ -71,9 +71,12 @@
   .shots-wrap{padding:0 14px 4px}
   .shots-title{font-size:12px;color:var(--muted);font-weight:700;margin:4px 2px 8px}
   .shots{display:flex;gap:9px;overflow-x:auto;padding-bottom:6px}.shots::-webkit-scrollbar{display:none}
-  .shot{flex:0 0 auto;width:76px;height:76px;border-radius:14px;overflow:hidden;border:1px solid var(--line);position:relative;cursor:pointer}
-  .shot img{width:100%;height:100%;object-fit:cover}
-  .shot .ok{position:absolute;bottom:3px;right:3px;font-size:8px;font-weight:800;background:var(--orange);color:#160f08;padding:1px 5px;border-radius:8px}
+  .shot{flex:0 0 auto;width:84px;cursor:pointer}
+  .shot .si{width:84px;height:84px;border-radius:14px;overflow:hidden;border:1px solid var(--line);position:relative}
+  .shot .si img{width:100%;height:100%;object-fit:cover}
+  .shot .si .ok{position:absolute;bottom:3px;right:3px;font-size:8px;font-weight:800;background:var(--orange);color:#160f08;padding:1px 5px;border-radius:8px}
+  .shot .cap{font-size:9.5px;color:var(--cream);font-weight:700;margin-top:5px;text-align:center;line-height:1.2}
+  .analiz{font-size:12px;color:var(--orange-lt);font-weight:700;margin-bottom:8px}
   .grid{padding:6px 14px 4px;display:grid;grid-template-columns:1fr 1fr;gap:11px}
   .card{background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:18px;padding:10px;position:relative;overflow:hidden;cursor:pointer;transition:transform .15s}
   .card:active{transform:scale(.97)}.card.locked{opacity:.55}
@@ -234,10 +237,10 @@ const RAR={yaygin:{tr:'YAYGIN',col:'var(--common)'},nadir:{tr:'NADİR',col:'var(
 const gains={yaygin:15,nadir:30,ender:55,destansi:90,efsane:150};
 function srcOf(cat){return (photos[cat.id]||cat.photo);}
 function img(cat){return `<img class="catphoto" src="${srcOf(cat)}" alt="${cat.name}" loading="lazy" style="--fb:${cat.fb}">`;}
-let coins=120,xp=0;const caught=new Set();let photos={},shots=[];
-function save(){try{localStorage.setItem('patiavi',JSON.stringify({coins,xp,caught:[...caught],photos}));}catch(e){}}
+let coins=120,xp=0;const caught=new Set();let photos={},pmeta={},shots=[];
+function save(){try{localStorage.setItem('patiavi',JSON.stringify({coins,xp,caught:[...caught],photos,pmeta}));}catch(e){}}
 function saveShots(){try{shots=shots.slice(-24);localStorage.setItem('patiavi_shots',JSON.stringify(shots));}catch(e){}}
-function load(){try{const d=JSON.parse(localStorage.getItem('patiavi'));if(d){coins=d.coins??120;xp=d.xp??0;(d.caught||[]).forEach(id=>caught.add(id));photos=d.photos||{};}}catch(e){}
+function load(){try{const d=JSON.parse(localStorage.getItem('patiavi'));if(d){coins=d.coins??120;xp=d.xp??0;(d.caught||[]).forEach(id=>caught.add(id));photos=d.photos||{};pmeta=d.pmeta||{};}}catch(e){}
   try{shots=JSON.parse(localStorage.getItem('patiavi_shots')||'[]');}catch(e){shots=[];}}
 load();
 function syncCoins(){document.getElementById('coinCount').textContent=coins;save();}
@@ -287,15 +290,47 @@ function show(id){
   if(id==='catch')enterCamera(null);else stopCam();
 }
 document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>show(b.dataset.go));
-/* KAMERA (telefonun kendi kamerası) + ML */
-let cocoModel=null,currentWild=null;
+/* KAMERA (telefonun kendi kamerası) + tür analizi */
+let mobilenetModel=null,currentWild=null;
 const snap=document.getElementById('snap'),camInput=document.getElementById('camInput');
 (function loadModel(){
   const tf=document.createElement('script');tf.src='https://cdnjs.cloudflare.com/ajax/libs/tensorflow/4.22.0/tf.min.js';
-  tf.onload=()=>{const co=document.createElement('script');co.src='https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3/dist/coco-ssd.min.js';
-    co.onload=()=>{if(window.cocoSsd)cocoSsd.load().then(m=>cocoModel=m).catch(()=>{});};document.body.appendChild(co);};
+  tf.onload=()=>{const mn=document.createElement('script');mn.src='https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.0/dist/mobilenet.min.js';
+    mn.onload=()=>{if(window.mobilenet)mobilenet.load().then(m=>mobilenetModel=m).catch(()=>{});};document.body.appendChild(mn);};
   document.body.appendChild(tf);
 })();
+function dominantColor(){
+  try{
+    const ctx=snap.getContext('2d'),w=snap.width,h=snap.height;
+    const sx=Math.floor(w*0.3),sy=Math.floor(h*0.3),sw=Math.max(1,Math.floor(w*0.4)),sh=Math.max(1,Math.floor(h*0.4));
+    const d=ctx.getImageData(sx,sy,sw,sh).data;let r=0,g=0,b=0,n=0;
+    for(let i=0;i<d.length;i+=16){r+=d[i];g+=d[i+1];b+=d[i+2];n++;}
+    r/=n;g/=n;b/=n;const max=Math.max(r,g,b),min=Math.min(r,g,b);
+    if(max>178&&min>150)return 'beyaz';
+    if(max<68)return 'kara';
+    if(r>118&&r>g+16&&g>=b)return 'sarman';
+    if(Math.abs(r-g)<24&&Math.abs(g-b)<24)return 'gri';
+    if(r>g&&g>b)return 'sarı tekir';
+    return '';
+  }catch(e){return '';}
+}
+async function analyzeCat(){
+  const color=dominantColor();let breed='tekir',conf=null,isCat=false;
+  if(mobilenetModel){
+    try{
+      const preds=await mobilenetModel.classify(snap,5);
+      const map=[['tabby','tekir'],['tiger cat','tekir'],['egyptian cat','tekir'],['persian cat','İran kedisi'],['siamese','Siyam kedisi'],['angora','Ankara kedisi']];
+      for(const p of preds){const cn=(p.className||'').toLowerCase();
+        for(const[k,tr]of map){if(cn.includes(k)){breed=tr;conf=Math.round(p.probability*100);isCat=true;break;}}
+        if(isCat)break;}
+      if(!isCat){const c=preds.find(p=>(p.className||'').toLowerCase().includes('cat'));
+        if(c){breed='tekir';conf=Math.round(c.probability*100);isCat=true;}}
+    }catch(e){}
+  }
+  const parts=[];if(color)parts.push(color);parts.push(breed);
+  let label=parts.join(' ');label=label.charAt(0).toUpperCase()+label.slice(1);
+  return {label,conf,isCat};
+}
 function stopCam(){}
 function enterCamera(target){
   currentWild=target;
@@ -314,31 +349,34 @@ camInput.onchange=()=>{
     const maxW=720,scale=Math.min(1,maxW/im.width),cw=Math.round(im.width*scale),ch=Math.round(im.height*scale);
     snap.width=cw;snap.height=ch;snap.getContext('2d').drawImage(im,0,0,cw,ch);
     let data='';try{data=snap.toDataURL('image/jpeg',0.72);}catch(e){data=url;}
-    let conf=null;
-    if(cocoModel){try{const preds=await cocoModel.detect(snap,5);const c=preds.find(p=>['cat','dog','teddy bear'].includes(p.class));conf=c?Math.round(c.score*100):null;}catch(e){}}
-    if(currentWild)catchNamed(currentWild,data,conf);else catchFree(data,conf);
+    const a=await analyzeCat();
+    if(currentWild)catchNamed(currentWild,data,a);else catchFree(data,a);
   };
   im.onerror=()=>toast('Fotoğraf okunamadı, tekrar dene.');
   im.src=url;
 };
-function catchNamed(cat,data,conf){
-  caught.add(cat.id);if(data)photos[cat.id]=data;coins+=gains[cat.rar];xp+=20;syncCoins();stopCam();
+function catchNamed(cat,data,a){
+  a=a||{label:'',conf:null};
+  caught.add(cat.id);if(data)photos[cat.id]=data;if(a.label)pmeta[cat.id]={label:a.label,conf:a.conf};
+  coins+=gains[cat.rar];xp+=20;syncCoins();stopCam();
   const r=RAR[cat.rar];
   document.getElementById('resBody').innerHTML=`
     ${data?`<div class="capimg"><img src="${data}"></div>`:`<div class="burst"><div class="pf">${img(cat)}</div></div>`}
     <h3>${cat.name}</h3>
-    <div class="sub">${conf?('Gerçek kedi algılandı %'+conf+' · '):''}${cat.hab}</div>
+    ${a.label?`<div class="analiz">Tür: <b>${a.label}</b>${a.conf?(' · %'+a.conf+' güven'):''}</div>`:''}
+    <div class="sub">${cat.hab}</div>
     <span class="pop-rar" style="background:${r.col};color:#160f08">${r.tr}</span>
     <div class="reward">+${gains[cat.rar]} jeton · +20 XP</div>`;
   document.getElementById('result').classList.add('show');
 }
-function catchFree(data,conf){
+function catchFree(data,a){
+  a=a||{label:'Sokak kedisi',conf:null};
   coins+=10;xp+=10;syncCoins();
-  shots.push({img:data,ts:Date.now(),conf});saveShots();stopCam();
+  shots.push({img:data,ts:Date.now(),conf:a.conf,type:a.label});saveShots();stopCam();
   document.getElementById('resBody').innerHTML=`
     <div class="capimg"><img src="${data}"></div>
-    <h3>Sokak kedisi</h3>
-    <div class="sub">${conf?('Gerçek kedi algılandı %'+conf+' · '):''}Çektiklerim albümüne kaydedildi.</div>
+    <h3>${a.label||'Sokak kedisi'}</h3>
+    <div class="analiz">${a.conf?('Analiz: %'+a.conf+' güven · '):'Analiz tamam · '}Çektiklerim albümüne kaydedildi.</div>
     <div class="reward">+10 jeton · +10 XP</div>`;
   document.getElementById('result').classList.add('show');
 }
@@ -355,7 +393,7 @@ function renderAlbum(){
   const sw=document.getElementById('shotsWrap'),sc=document.getElementById('shots');
   if(shots.length){sw.style.display='block';sc.innerHTML='';
     [...shots].reverse().forEach(s=>{const d=document.createElement('div');d.className='shot';
-      d.innerHTML=`<img src="${s.img}">`+(s.conf?`<span class="ok">%${s.conf}</span>`:'');
+      d.innerHTML=`<div class="si"><img src="${s.img}">${s.conf?`<span class="ok">%${s.conf}</span>`:''}</div><div class="cap">${s.type||'Sokak kedisi'}</div>`;
       d.onclick=()=>openViewer(s);sc.appendChild(d);});
   }else sw.style.display='none';
   grid.innerHTML='';
@@ -371,6 +409,7 @@ function renderAlbum(){
       </div>
       <div class="nm">${got?cat.name:'?????'}</div>
       <div class="hb">${got?cat.hab:'Henüz bulunamadı'}</div>
+      ${got&&pmeta[cat.id]?`<div class="hb" style="color:var(--orange-lt)">Tür: ${pmeta[cat.id].label}${pmeta[cat.id].conf?(' · %'+pmeta[cat.id].conf):''}</div>`:''}
       <div class="stats">
         <div class="pip"><i style="width:${got?cat.hp:0}%;background:var(--orange)"></i></div>
         <div class="pip"><i style="width:${got?cat.atk:0}%;background:#ff6b6b"></i></div>
@@ -383,7 +422,8 @@ function renderAlbum(){
 }
 function openViewer(s){
   document.getElementById('viewerImg').innerHTML=`<img src="${s.img}">`;
-  const d=new Date(s.ts);document.getElementById('viewerCap').textContent=(s.conf?('Gerçek kedi %'+s.conf+' · '):'')+d.toLocaleDateString('tr-TR')+' '+d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
+  const d=new Date(s.ts);
+  document.getElementById('viewerCap').innerHTML=`<b style="color:var(--orange-lt)">${s.type||'Sokak kedisi'}</b>${s.conf?(' · %'+s.conf+' güven'):''}<br>${d.toLocaleDateString('tr-TR')} ${d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})}`;
   document.getElementById('viewer').classList.add('show');
 }
 document.getElementById('viewerClose').onclick=()=>document.getElementById('viewer').classList.remove('show');
